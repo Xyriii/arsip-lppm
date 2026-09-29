@@ -42,7 +42,14 @@
   {# Lucide Icons #}
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <script src="{% static 'js/main.js' %}"></script>
+{# Cegah browser restore scroll position secara instan (biar animasi enter keliatan) #}
+<script>
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+</script>
+
+<script src="{% static 'js/main.js' %}"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

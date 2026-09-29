@@ -558,3 +558,114 @@ input[type="file"].input {
 .mb-4 { margin-bottom: var(--space-4); }
 .mb-6 { margin-bottom: var(--space-6); }
 .hidden { display: none !important; }
+
+/* ============================================================
+   ANIMASI — ditambahkan sesuai request Lead
+   Semua durasi ≤ 400ms sesuai design.md
+   ============================================================ */
+
+/* ----- 1. Page Enter (saat halaman load) ----- */
+.main-content {
+  animation: page-enter 250ms ease-out both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ----- 2. Page Exit (saat klik link internal) ----- */
+.main-content.is-leaving {
+  animation: page-exit 150ms ease-in both;
+}
+
+@keyframes page-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* ----- 3. Button Press — lebih hidup ----- */
+.btn {
+  transition: transform 100ms ease-out,
+              box-shadow 150ms ease-out,
+              background 150ms ease-out;
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.btn-danger:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+
+.btn-ghost:active {
+  transform: scale(0.98);
+  transition-duration: 80ms;
+}
+
+/* ----- 4. Card Entry Stagger ----- */
+.card-enter {
+  animation: card-enter 250ms ease-out both;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ----- 5. Row Entry di Tabel ----- */
+.table tbody tr {
+  animation: row-enter 200ms ease-out both;
+}
+
+@keyframes row-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Delay berurutan biar keliatan stagger (maks 5 baris, sisanya instant) */
+.table tbody tr:nth-child(1) { animation-delay: 0ms; }
+.table tbody tr:nth-child(2) { animation-delay: 30ms; }
+.table tbody tr:nth-child(3) { animation-delay: 60ms; }
+.table tbody tr:nth-child(4) { animation-delay: 90ms; }
+.table tbody tr:nth-child(5) { animation-delay: 120ms; }
+.table tbody tr:nth-child(n+6) { animation-delay: 150ms; }
+
+/* ----- 6. Form focus subtle highlight ----- */
+.glass-card form:focus-within {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset,
+              0 12px 40px rgba(0, 88, 168, 0.12);
+}
+
+/* ----- 7. Prefers Reduced Motion (accessibility) ----- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
