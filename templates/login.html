@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Masuk — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container login-wrapper">
+  <div class="glass-card">
+    <div class="text-center mb-6">
+      <img src="{% static 'img/logo-uns.svg' %}"
+           alt="Logo LPPM UNS"
+           style="height:64px;margin:0 auto 16px;">
+      <h1 style="font-size:24px;margin-bottom:8px;">Masuk ke Arsip LPPM</h1>
+      <p class="text-muted" style="font-size:14px;margin:0;">
+        Unit Kearsipan II LPPM &mdash; UNS
+      </p>
+    </div>
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username"
+               class="input" placeholder="Masukkan username"
+               required autofocus autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               class="input" placeholder="Masukkan password"
+               required autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">
+        <i data-lucide="log-in" style="width:18px;height:18px;"></i>
+        Masuk
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% load static %}
+<nav class="navbar" aria-label="Navigasi utama">
+  <div class="navbar-container">
+    <a href="/" class="navbar-brand">
+      <img src="{% static 'img/logo-uns.svg' %}" alt="Logo LPPM UNS">
+      <span>Arsip LPPM UNS</span>
+    </a>
+
+    <button class="icon-btn navbar-toggle"
+            aria-label="Buka menu navigasi"
+            aria-expanded="false"
+            onclick="toggleMenu(this)">
+      <i data-lucide="menu" style="width:20px;height:20px;"></i>
+    </button>
+
+    <div class="navbar-menu" id="navbar-menu">
+      <a href="/arsip/" class="navbar-link {% if active == 'arsip' %}active{% endif %}">Arsip</a>
+      <a href="/upload/" class="navbar-link {% if active == 'upload' %}active{% endif %}">Unggah</a>
+      <a href="/logout/" class="navbar-link">Keluar</a>
+
+      <button class="icon-btn" aria-label="Ganti mode gelap" onclick="toggleTheme()">
+        <i data-lucide="moon" class="icon-moon" style="width:20px;height:20px;"></i>
+        <i data-lucide="sun" class="icon-sun hidden" style="width:20px;height:20px;"></i>
+      </button>
+    </div>
+  </div>
+</nav>

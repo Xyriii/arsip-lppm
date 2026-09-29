@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Arsip LPPM UNS{% endblock %}</title>
+  <meta name="description" content="Sistem Kearsipan Digital Unit Kearsipan II LPPM Universitas Sebelas Maret">
+
+  {# Dark mode: set sebelum body render biar gak flicker #}
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  {# Font Inter #}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  {# CSS #}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  {% include 'components/navbar.html' %}
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include 'components/footer.html' %}
+
+  {# Lucide Icons #}
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

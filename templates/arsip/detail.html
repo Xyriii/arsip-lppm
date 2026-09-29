@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ arsip.judul }} — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container container-narrow">
+  <a href="{% url 'arsip:list' %}" class="btn btn-ghost btn-sm mb-4">
+    <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+    Kembali
+  </a>
+
+  <div class="glass-card">
+    <div class="flex justify-between items-start flex-wrap gap-4 mb-6">
+      <div>
+        <h1 style="margin-bottom:8px;">{{ arsip.judul }}</h1>
+        <span class="chip chip-{{ arsip.kategori }}">{{ arsip.get_kategori_display }}</span>
+      </div>
+      <a href="{{ arsip.file.url }}" download class="btn btn-primary">
+        <i data-lucide="download" style="width:18px;height:18px;"></i>
+        Unduh
+      </a>
+    </div>
+
+    <dl class="detail-list">
+      <dt>Tahun</dt>
+      <dd class="num">{{ arsip.tahun }}</dd>
+
+      <dt>Kategori</dt>
+      <dd>{{ arsip.get_kategori_display }}</dd>
+
+      <dt>Diunggah oleh</dt>
+      <dd>{{ arsip.uploaded_by }}</dd>
+
+      <dt>Tanggal unggah</dt>
+      <dd class="num">{{ arsip.created_at|date:"d M Y" }}</dd>
+
+      {% if arsip.deskripsi %}
+        <dt>Deskripsi</dt>
+        <dd>{{ arsip.deskripsi }}</dd>
+      {% endif %}
+    </dl>
+  </div>
+</div>
+{% endblock %}
