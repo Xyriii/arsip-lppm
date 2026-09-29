@@ -1,68 +1,36 @@
 {% extends 'base.html' %}
 
-{% block title %}Unggah Arsip — Arsip LPPM UNS{% endblock %}
+{% block title %}Upload Arsip — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
-<div class="container container-narrow">
-  <h1>Unggah Arsip</h1>
+<a href="{% url 'arsip:list' %}" class="btn-ghost">← Kembali</a>
 
-  <form method="post" enctype="multipart/form-data" class="glass-card">
+<div class="glass-card detail-card">
+  <h1>Upload Arsip Baru</h1>
+
+  {% if form.errors %}
+    <div class="alert alert-error">
+      Ada kesalahan di form. Cek lagi isian Anda.
+    </div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="upload-form">
     {% csrf_token %}
 
-    {% if form.non_field_errors %}
-      <div class="toast toast-danger" style="position:static;margin-bottom:16px;animation:none;">
-        {% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}
-      </div>
-    {% endif %}
-
-    <div class="form-group">
-      <label for="{{ form.name.id_for_label }}">Nama Arsip</label>
-      {{ form.name }}
-      {% if form.name.errors %}
-        <div style="color:var(--color-danger);font-size:13px;margin-top:4px;">{{ form.name.errors.0 }}</div>
-      {% endif %}
-    </div>
-
-    <div class="flex flex-wrap gap-4">
-      <div class="form-group" style="flex:1;min-width:140px;">
-        <label for="{{ form.file_type.id_for_label }}">Tipe Berkas</label>
-        {{ form.file_type }}
-        {% if form.file_type.errors %}
-          <div style="color:var(--color-danger);font-size:13px;margin-top:4px;">{{ form.file_type.errors.0 }}</div>
+    {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="field-error">{{ field.errors.0 }}</div>
+        {% endif %}
+        {% if field.help_text %}
+          <small class="text-muted">{{ field.help_text }}</small>
         {% endif %}
       </div>
-      <div class="form-group" style="flex:1;min-width:140px;">
-        <label for="{{ form.folder.id_for_label }}">Folder / Tahun</label>
-        {{ form.folder }}
-        {% if form.folder.errors %}
-          <div style="color:var(--color-danger);font-size:13px;margin-top:4px;">{{ form.folder.errors.0 }}</div>
-        {% endif %}
-      </div>
-    </div>
+    {% endfor %}
 
-    <div class="form-group">
-      <label for="{{ form.description.id_for_label }}">Deskripsi (opsional)</label>
-      {{ form.description }}
-      {% if form.description.errors %}
-        <div style="color:var(--color-danger);font-size:13px;margin-top:4px;">{{ form.description.errors.0 }}</div>
-      {% endif %}
-    </div>
-
-    <div class="form-group">
-      <label for="{{ form.file.id_for_label }}">Berkas</label>
-      {{ form.file }}
-      {% if form.file.errors %}
-        <div style="color:var(--color-danger);font-size:13px;margin-top:4px;">{{ form.file.errors.0 }}</div>
-      {% endif %}
-    </div>
-
-    <div class="flex justify-between flex-wrap gap-2 mt-6">
-      <a href="{% url 'arsip:list' %}" class="btn btn-secondary">Batal</a>
-      <button type="submit" class="btn btn-primary">
-        <i data-lucide="upload" style="width:18px;height:18px;"></i>
-        Unggah
-      </button>
-    </div>
+    <button type="submit" class="btn btn-primary btn-full">Upload</button>
   </form>
 </div>
 {% endblock %}

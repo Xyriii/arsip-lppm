@@ -923,3 +923,135 @@ input[type="file"].input {
   }
   .toast { min-width: 0; max-width: none; }
 }
+/* ============================================
+   BROWSE LAYOUT
+   ============================================ */
+.browse-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.browse-sidebar {
+  padding: 20px;
+  position: sticky;
+  top: 88px;
+}
+
+.browse-sidebar h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.tree-root {
+  list-style: none;
+  padding: 0;
+}
+
+.tree-root li {
+  padding: 8px 0;
+}
+
+.tree-root a {
+  color: var(--color-ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.tree-root a:hover {
+  color: var(--color-primary);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-ink-muted);
+  margin-bottom: 16px;
+}
+
+.breadcrumb a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* Folder Grid */
+.folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.folder-card {
+  padding: 20px;
+  text-decoration: none;
+  color: var(--color-ink);
+  transition: transform 150ms, box-shadow 150ms;
+}
+
+.folder-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 88, 168, 0.12);
+}
+
+.folder-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.folder-name {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.folder-meta {
+  font-size: 12px;
+  color: var(--color-ink-muted);
+}
+
+/* Arsip List */
+.arsip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.arsip-item {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.arsip-item a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.arsip-item a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .browse-layout {
+    grid-template-columns: 1fr;
+  }
+  .browse-sidebar {
+    position: static;
+  }
+}

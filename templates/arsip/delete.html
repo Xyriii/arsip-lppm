@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Hapus Arsip — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="glass-card detail-card" style="max-width: 480px; margin: 48px auto;">
+  <h1>Hapus Arsip?</h1>
+  <p style="margin-bottom: 24px;">
+    Yakin mau hapus <strong>{{ arsip.name }}</strong>?
+    Tindakan ini gak bisa dibatalkan.
+  </p>
+
+  <form method="post" style="display: flex; gap: 12px;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary" style="background: #DC2626;">
+      Ya, Hapus
+    </button>
+    <a href="{% url 'arsip:list' %}" class="btn-ghost">Batal</a>
+  </form>
+</div>
+{% endblock %}

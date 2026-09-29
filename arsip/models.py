@@ -2,7 +2,15 @@ from django.db import models
 
 
 class Folder(models.Model):
-    """Folder arsip (bisa nested)"""
+    """Folder arsip multi-level (mirip AtoM)"""
+    LEVEL_CHOICES = [
+        ('fonds', 'Fonds'),
+        ('subfonds', 'Sub-Fonds'),
+        ('series', 'Series'),
+        ('file', 'File'),
+        ('item', 'Item'),
+    ]
+
     name = models.CharField(max_length=255)
     parent = models.ForeignKey(
         'self',
@@ -10,6 +18,18 @@ class Folder(models.Model):
         on_delete=models.CASCADE,
         related_name='children'
     )
+    level = models.CharField(
+        max_length=20,
+        choices=LEVEL_CHOICES,
+        default='file',
+        db_index=True
+    )
+    reference_code = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name='Kode Referensi'
+    )
+    description = models.TextField(blank=True, verbose_name='Deskripsi')
     year = models.IntegerField(db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -19,11 +39,11 @@ class Folder(models.Model):
         verbose_name_plural = 'Folders'
 
     def __str__(self):
-        return f"{self.year} / {self.name}"
+        return f"[{self.get_level_display()}] {self.name}"
 
 
 class Arsip(models.Model):
-    """File arsip (PDF / XLSX)"""
+    """File arsip (Item)"""
     FILE_TYPE_CHOICES = [
         ('pdf', 'PDF'),
         ('xlsx', 'Excel'),
@@ -44,6 +64,20 @@ class Arsip(models.Model):
         default='pdf'
     )
     size_bytes = models.BigIntegerField(default=0)
+    reference_code = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name='Kode Referensi'
+    )
+    date_created = models.DateField(
+        null=True, blank=True,
+        verbose_name='Tanggal Arsip'
+    )
+    creator = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Pencipta Arsip'
+    )
     description = models.TextField(blank=True, verbose_name='Keterangan')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
@@ -56,5 +90,4 @@ class Arsip(models.Model):
         return self.name
 
     def size_mb(self):
-        """Ukuran file dalam MB"""
         return round(self.size_bytes / (1024 * 1024), 2)

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Jelajah Arsip — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="browse-layout">
+
+  <!-- SIDEBAR: Pohon Folder -->
+  <aside class="browse-sidebar glass-card">
+    <h3>Struktur Arsip</h3>
+    <ul class="tree-root">
+      {% for root in root_folders %}
+        <li>
+          <a href="{% url 'arsip:folder' root.pk %}">
+            📁 {{ root.name }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <!-- KONTEN: Isi Folder -->
+  <section class="browse-content">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a href="{% url 'arsip:browse' %}">Beranda</a>
+      {% for crumb in breadcrumb %}
+        <span>›</span>
+        <a href="{% url 'arsip:folder' crumb.pk %}">{{ crumb.name }}</a>
+      {% endfor %}
+    </nav>
+
+    <!-- Judul -->
+    <h1>
+      {% if current_folder %}
+        {{ current_folder.name }}
+      {% else %}
+        Jelajah Arsip
+      {% endif %}
+    </h1>
+
+    <!-- Sub-folder -->
+    {% if subfolders %}
+      <div class="folder-grid">
+        {% for folder in subfolders %}
+          <a href="{% url 'arsip:folder' folder.pk %}" class="folder-card glass-card">
+            <div class="folder-icon">📁</div>
+            <div class="folder-name">{{ folder.name }}</div>
+            <div class="folder-meta">{{ folder.get_level_display }} · {{ folder.year }}</div>
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- File / Arsip -->
+    {% if arsip_list %}
+      <div class="arsip-list">
+        {% for arsip in arsip_list %}
+          <div class="arsip-item glass-card">
+            <div>
+              <a href="{% url 'arsip:detail' arsip.pk %}">{{ arsip.name }}</a>
+              <div class="text-muted">{{ arsip.description|truncatechars:80 }}</div>
+            </div>
+            <a href="{{ arsip.file.url }}" download class="btn-ghost">Unduh</a>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Empty state -->
+    {% if not subfolders and not arsip_list %}
+      <div class="empty-state">
+        <p>Folder ini kosong.</p>
+      </div>
+    {% endif %}
+
+  </section>
+</div>
+{% endblock %}
