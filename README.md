@@ -120,7 +120,7 @@ Admin: http://localhost:8000/admin
 Tim Pengembang
 Nama	                    Role	            Tugas
 [Eyiri Ady Wikrama]	        Lead + Backend	    Django, database, integrasi, deploy
-[Andhika Herdian Pratama]	Frontend	        Halaman publik, HTML/CSS
+[Andika Herdian Pratama]	Frontend	        Halaman publik, HTML/CSS
 [Dewa Adiraksa Arwanta]	    Data Entry	        Upload arsip, isi metadata
 [Anggi Kurniasari]	        QA + Dokumentasi	Testing, laporan, slide
 
