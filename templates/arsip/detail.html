@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ arsip.judul }} — Arsip LPPM UNS{% endblock %}
+{% block title %}{{ arsip.name }} — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
 <div class="container container-narrow">
@@ -12,8 +12,8 @@
   <div class="glass-card">
     <div class="flex justify-between items-start flex-wrap gap-4 mb-6">
       <div>
-        <h1 style="margin-bottom:8px;">{{ arsip.judul }}</h1>
-        <span class="chip chip-{{ arsip.kategori }}">{{ arsip.get_kategori_display }}</span>
+        <h1 style="margin-bottom:8px;">{{ arsip.name }}</h1>
+        <span class="chip chip-{{ arsip.file_type }}">{{ arsip.get_file_type_display }}</span>
       </div>
       <a href="{{ arsip.file.url }}" download class="btn btn-primary">
         <i data-lucide="download" style="width:18px;height:18px;"></i>
@@ -23,20 +23,25 @@
 
     <dl class="detail-list">
       <dt>Tahun</dt>
-      <dd class="num">{{ arsip.tahun }}</dd>
+      <dd class="num">{{ arsip.folder.year }}</dd>
 
-      <dt>Kategori</dt>
-      <dd>{{ arsip.get_kategori_display }}</dd>
+      <dt>Tipe Berkas</dt>
+      <dd>{{ arsip.get_file_type_display }}</dd>
 
-      <dt>Diunggah oleh</dt>
-      <dd>{{ arsip.uploaded_by }}</dd>
+      <dt>Ukuran</dt>
+      <dd class="num">{{ arsip.size_bytes|filesizeformat }}</dd>
+
+      {% if arsip.uploaded_by %}
+        <dt>Diunggah oleh</dt>
+        <dd>{{ arsip.uploaded_by.get_full_name|default:arsip.uploaded_by.username }}</dd>
+      {% endif %}
 
       <dt>Tanggal unggah</dt>
-      <dd class="num">{{ arsip.created_at|date:"d M Y" }}</dd>
+      <dd class="num">{{ arsip.uploaded_at|date:"d M Y, H:i" }}</dd>
 
-      {% if arsip.deskripsi %}
+      {% if arsip.description %}
         <dt>Deskripsi</dt>
-        <dd>{{ arsip.deskripsi }}</dd>
+        <dd>{{ arsip.description }}</dd>
       {% endif %}
     </dl>
   </div>

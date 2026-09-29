@@ -31,7 +31,16 @@
   {% block head_extra %}{% endblock %}
 </head>
 <body>
-  {% include 'components/navbar.html' %}
+    {% include 'components/navbar.html' %}
+
+  {# Django messages → otomatis jadi toast via JS #}
+  {% if messages %}
+    <div id="django-messages" hidden>
+      {% for message in messages %}
+        <span data-message="{{ message }}" data-type="{{ message.tags|default:'info' }}"></span>
+      {% endfor %}
+    </div>
+  {% endif %}
 
   <main class="main-content">
     {% block content %}{% endblock %}
