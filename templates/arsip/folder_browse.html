@@ -6,18 +6,14 @@
 <div class="browse-layout">
 
   <!-- SIDEBAR: Pohon Folder -->
-  <aside class="browse-sidebar glass-card">
-    <h3>Struktur Arsip</h3>
-    <ul class="tree-root">
-      {% for root in root_folders %}
-        <li>
-          <a href="{% url 'arsip:folder' root.pk %}">
-            📁 {{ root.name }}
-          </a>
-        </li>
-      {% endfor %}
-    </ul>
-  </aside>
+<aside class="browse-sidebar glass-card">
+  <h3>Struktur Arsip</h3>
+  {% if full_tree %}
+    {% include 'components/tree_node.html' with nodes=full_tree %}
+  {% else %}
+    <p class="text-muted">Belum ada folder.</p>
+  {% endif %}
+</aside>
 
   <!-- KONTEN: Isi Folder -->
   <section class="browse-content">

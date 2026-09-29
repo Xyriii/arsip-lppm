@@ -1,0 +1,25 @@
+{% load static %}
+<ul class="tree-list">
+  {% for node in nodes %}
+    <li class="tree-item {% if node.folder.id == current_folder_id %}active{% endif %}">
+      {% if node.children %}
+        <span class="tree-toggle" data-target="node-{{ node.folder.id }}">
+          <span class="chevron">▸</span>
+        </span>
+      {% else %}
+        <span class="tree-toggle empty"></span>
+      {% endif %}
+      
+      <a href="{% url 'arsip:folder' node.folder.pk %}" class="tree-link">
+        {% if node.children %}📂{% else %}📁{% endif %}
+        {{ node.folder.name }}
+      </a>
+      
+      {% if node.children %}
+        <div class="tree-children" id="node-{{ node.folder.id }}" style="display: none;">
+          {% include 'components/tree_node.html' with nodes=node.children %}
+        </div>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>

@@ -947,23 +947,86 @@ input[type="file"].input {
   letter-spacing: 0.05em;
 }
 
-.tree-root {
+/* ============================================
+   TREE VIEW
+   ============================================ */
+.tree-list {
   list-style: none;
-  padding: 0;
+  padding-left: 0;
+  margin: 0;
 }
 
-.tree-root li {
-  padding: 8px 0;
+.tree-children {
+  padding-left: 20px;
+  border-left: 1px dashed rgba(0, 88, 168, 0.2);
+  margin-left: 10px;
+  margin-top: 4px;
 }
 
-.tree-root a {
+.tree-item {
+  padding: 4px 0;
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 150ms;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.tree-toggle:hover {
+  background: rgba(0, 88, 168, 0.08);
+}
+
+.tree-toggle.empty {
+  cursor: default;
+}
+
+.tree-toggle.empty:hover {
+  background: transparent;
+}
+
+.chevron {
+  font-size: 10px;
+  color: var(--color-ink-muted);
+  transition: transform 200ms;
+  display: inline-block;
+}
+
+.tree-toggle.open .chevron {
+  transform: rotate(90deg);
+}
+
+.tree-link {
   color: var(--color-ink);
   text-decoration: none;
   font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 150ms, color 150ms;
+  flex: 1;
+  word-break: break-word;
 }
 
-.tree-root a:hover {
+.tree-link:hover {
+  background: rgba(0, 88, 168, 0.06);
   color: var(--color-primary);
+}
+
+.tree-item.active > .tree-link {
+  background: rgba(0, 88, 168, 0.1);
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 /* Breadcrumb */

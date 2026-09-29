@@ -13,6 +13,22 @@ def build_breadcrumb(folder):
         current = current.parent
     return breadcrumb
 
+def build_full_tree():
+    """Build full tree of ALL folders (nested)"""
+    all_folders = list(Folder.objects.all().order_by('name'))
+    
+    def _build(parent_id):
+        nodes = []
+        for f in all_folders:
+            if f.parent_id == parent_id:
+                nodes.append({
+                    'folder': f,
+                    'children': _build(f.id),
+                })
+        return nodes
+    
+    return _build(None)
+
 
 def build_tree(folders, parent=None):
     """Bikin struktur pohon dari list folder"""

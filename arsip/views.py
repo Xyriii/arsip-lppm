@@ -6,7 +6,7 @@ from .models import Arsip, Folder
 from .forms import ArsipForm
 from .utils import build_breadcrumb
 from .models import Arsip, Folder
-
+from .utils import build_breadcrumb, build_full_tree
 
 @login_required
 def arsip_list(request):
@@ -74,13 +74,12 @@ def arsip_delete(request, pk):
     return render(request, 'arsip/delete.html', {'arsip': arsip})
 @login_required
 def folder_browse(request, pk=None):
-    """Browse folder (tree view). Kalau pk kosong, tampilkan root."""
+    """Browse folder (tree view)"""
     if pk:
         current_folder = get_object_or_404(Folder, pk=pk)
     else:
         current_folder = None
 
-    # Ambil sub-folder dari folder yang aktif
     if current_folder:
         subfolders = Folder.objects.filter(parent=current_folder).order_by('name')
         arsip_list = Arsip.objects.filter(folder=current_folder).order_by('-uploaded_at')
@@ -88,17 +87,15 @@ def folder_browse(request, pk=None):
         subfolders = Folder.objects.filter(parent__isnull=True).order_by('name')
         arsip_list = Arsip.objects.none()
 
-    # Breadcrumb
     breadcrumb = build_breadcrumb(current_folder) if current_folder else []
-
-    # Sidebar: semua folder root buat pohon
-    root_folders = Folder.objects.filter(parent__isnull=True).order_by('name')
+    full_tree = build_full_tree()  # <-- BARU
 
     context = {
         'current_folder': current_folder,
         'subfolders': subfolders,
         'arsip_list': arsip_list,
         'breadcrumb': breadcrumb,
-        'root_folders': root_folders,
+        'full_tree': full_tree,
+        'current_folder_id': current_folder.id if current_folder else None,
     }
     return render(request, 'arsip/folder_browse.html', context)
