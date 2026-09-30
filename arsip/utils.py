@@ -14,8 +14,8 @@ def build_breadcrumb(folder):
     return breadcrumb
 
 def build_full_tree():
-    """Build full tree of ALL folders (nested)"""
-    all_folders = list(Folder.objects.all().order_by('name'))
+    """Build full tree of ALL active folders (nested)"""
+    all_folders = list(Folder.objects.filter(is_active=True).order_by('order', 'name'))
     
     def _build(parent_id):
         nodes = []

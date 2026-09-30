@@ -33,8 +33,25 @@ class Folder(models.Model):
     year = models.IntegerField(db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Field baru (adjustable)
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Aktif',
+        help_text='Uncheck untuk soft delete'
+    )
+    order = models.IntegerField(
+        default=0,
+        verbose_name='Urutan'
+    )
+    tags = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Tags',
+        help_text='Pisahkan dengan koma (contoh: sk, penting, 2026)'
+    )
+
     class Meta:
-        ordering = ['name']
+        ordering = ['order', 'name']
         verbose_name = 'Folder'
         verbose_name_plural = 'Folders'
 
@@ -79,6 +96,18 @@ class Arsip(models.Model):
         verbose_name='Pencipta Arsip'
     )
     description = models.TextField(blank=True, verbose_name='Keterangan')
+
+    # Field baru (adjustable)
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Aktif'
+    )
+    tags = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Tags'
+    )
+
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
