@@ -5,17 +5,23 @@
 {% block content %}
 <div class="container">
   <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
-    <div>
-      <h1 style="margin-bottom:4px;">Daftar Arsip</h1>
-      <p class="text-muted" style="margin:0;font-size:14px;">
-        Unit Kearsipan II LPPM &mdash; UNS
-      </p>
-    </div>
+  <div>
+    <h1 style="margin-bottom:4px;">Daftar Arsip</h1>
+    <p class="text-muted" style="margin:0;font-size:14px;">
+      Unit Kearsipan II LPPM &mdash; UNS
+    </p>
+  </div>
+  <div class="flex gap-2 flex-wrap">
+    <a href="{% url 'arsip:browse' %}" class="btn btn-secondary">
+      <i data-lucide="folder-tree" style="width:18px;height:18px;"></i>
+      Telusuri Folder
+    </a>
     <a href="{% url 'arsip:upload' %}" class="btn btn-primary">
       <i data-lucide="upload" style="width:18px;height:18px;"></i>
       Unggah Berkas
     </a>
   </div>
+</div>
 
   {# Filter #}
   <form method="get" class="glass-card" style="margin-bottom:24px;">

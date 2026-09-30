@@ -6,13 +6,13 @@
 <div class="container container-narrow">
   <a href="{% url 'arsip:list' %}" class="btn btn-ghost btn-sm mb-4">
     <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
-    Kembali
+    Kembali ke Daftar
   </a>
 
   <div class="glass-card">
     <div class="flex justify-between items-start flex-wrap gap-4 mb-6">
-      <div>
-        <h1 style="margin-bottom:8px;">{{ arsip.name }}</h1>
+      <div style="min-width:0;">
+        <h1 style="margin-bottom:8px;word-break:break-word;">{{ arsip.name }}</h1>
         <span class="chip chip-{{ arsip.file_type }}">{{ arsip.get_file_type_display }}</span>
       </div>
       <a href="{{ arsip.file.url }}" download class="btn btn-primary">
@@ -44,6 +44,47 @@
         <dd>{{ arsip.description }}</dd>
       {% endif %}
     </dl>
+
+    <hr style="border:none;border-top:1px solid var(--color-border);margin:24px 0;">
+
+    <div class="flex justify-end gap-2 flex-wrap">
+      <button type="button" class="btn btn-ghost"
+              style="color:var(--color-danger);"
+              onclick="openModal('modal-hapus-detail')">
+        <i data-lucide="trash-2" style="width:18px;height:18px;"></i>
+        Hapus
+      </button>
+    </div>
+  </div>
+</div>
+
+{# Modal hapus #}
+<div class="modal-overlay" id="modal-hapus-detail" role="dialog" aria-modal="true"
+     aria-labelledby="modal-title-detail">
+  <div class="modal">
+    <button type="button" class="modal-close" aria-label="Tutup dialog"
+            onclick="closeModal('modal-hapus-detail')">
+      <i data-lucide="x" style="width:18px;height:18px;"></i>
+    </button>
+    <div class="modal-icon">
+      <i data-lucide="alert-triangle" style="width:28px;height:28px;"></i>
+    </div>
+    <h3 class="modal-title" id="modal-title-detail">Hapus arsip ini?</h3>
+    <p class="modal-desc">
+      Arsip <strong>{{ arsip.name }}</strong> akan dihapus permanen.
+      Tindakan ini tidak bisa dibatalkan.
+    </p>
+    <form method="post" action="{% url 'arsip:delete' arsip.pk %}">
+      {% csrf_token %}
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary"
+                onclick="closeModal('modal-hapus-detail')" data-autofocus>Batal</button>
+        <button type="submit" class="btn btn-danger">
+          <i data-lucide="trash-2" style="width:18px;height:18px;"></i>
+          Hapus
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 {% endblock %}
