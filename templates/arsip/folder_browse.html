@@ -16,28 +16,14 @@
   <div class="layout-with-sidebar">
 
     {# ===== SIDEBAR TREE ===== #}
-    <aside class="sidebar" id="sidebar" aria-label="Struktur folder">
-      <div class="sidebar-header">
-        <span class="sidebar-title">Struktur Folder</span>
-        <a href="{% url 'arsip:browse' %}" class="btn btn-ghost btn-sm"
-           style="height:auto;padding:4px 8px;" aria-label="Kembali ke root">
-          <i data-lucide="home" style="width:14px;height:14px;"></i>
-        </a>
-      </div>
-
-      {% if full_tree %}
-        <ul class="tree">
-          {% for node in full_tree %}
-            {% include 'components/_tree_node.html' with node=node current_folder_id=current_folder_id %}
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="text-muted" style="font-size:13px;text-align:center;padding:16px 0;">
-          Belum ada folder.
-        </p>
-      {% endif %}
-    </aside>
-
+   <aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">Struktur Folder</span>
+  </div>
+  {% if full_tree %}
+    {% include 'components/tree_node.html' with nodes=full_tree current_folder_id=current_folder_id %}
+  {% endif %}
+</aside>
     {# ===== KONTEN ===== #}
     <main>
 

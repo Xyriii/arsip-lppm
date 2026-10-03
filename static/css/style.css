@@ -1174,12 +1174,6 @@ input[type="file"].input {
 }
 
 /* ---------- TREE ---------- */
-.tree, .tree-children {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
 .tree-children {
   margin-left: var(--space-3);
   padding-left: var(--space-3);
@@ -1423,4 +1417,127 @@ input[type="file"].input {
   .folder-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Mobile: sidebar default ketutup */
+.sidebar {
+  display: none;
+}
+
+.sidebar.open {
+  display: block;
+}
+
+/* Desktop: sidebar permanen */
+@media (min-width: 769px) {
+  .sidebar {
+    display: block !important;
+  }
+  
+  .sidebar-toggle-mobile {
+    display: none !important;  /* Sembunyiin tombol di desktop */
+  }
+  
+  .layout-with-sidebar {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+}
+.tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--color-ink-muted);
+  flex-shrink: 0;
+}
+
+.chevron {
+  font-size: 12px;
+  font-weight: bold;
+  transition: transform 200ms ease;
+  display: inline-block;
+}
+
+/* Chevron muter 90° pas terbuka */
+.tree-toggle.open .chevron {
+  transform: rotate(90deg);
+}
+
+/* Children ada indentasi */
+.tree-children {
+  padding-left: 20px;
+  border-left: 1px dashed rgba(0, 88, 168, 0.2);
+  margin-left: 10px;
+  margin-top: 4px;
+}
+
+/* PENTING: JANGAN ada display:none di .tree-children */
+/* Kalau ada, hapus dulu */
+/* ============================================================
+   FIX FINAL: TREE VIEW & SIDEBAR
+   (Taruh paling bawah biar nimpa semua definisi atas)
+   ============================================================ */
+
+/* Tree children default: KEBUKA */
+.tree-children {
+  display: block !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding-left: 20px !important;
+  border-left: 1px dashed rgba(0, 88, 168, 0.2) !important;
+  margin-left: 10px !important;
+  margin-top: 4px !important;
+}
+
+/* Kalau ditutup via JS: pakai class is-hidden */
+.tree-children.is-hidden {
+  display: none !important;
+}
+
+/* Chevron muter kalau terbuka */
+.tree-toggle.open .chevron,
+.tree-toggle[aria-expanded="true"] .chevron {
+  transform: rotate(90deg);
+}
+
+/* Sidebar default: KEBUKA (desktop) */
+.sidebar {
+  display: block !important;
+}
+
+/* Mobile: sidebar bisa di-toggle */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none !important;
+  }
+  .sidebar.open {
+    display: block !important;
+  }
+  .sidebar-toggle-mobile {
+    display: inline-flex !important;
+  }
+}
+
+/* Desktop: tombol toggle disembunyiin */
+@media (min-width: 769px) {
+  .sidebar-toggle-mobile {
+    display: none !important;
+  }
+}
+/* Sidebar lebih lebar biar nama folder gak kepotong */
+@media (min-width: 1025px) {
+  .layout-with-sidebar {
+    grid-template-columns: 320px 1fr !important;
+  }
+}
+.tree-link span[title] {
+  cursor: help;
 }
