@@ -38,14 +38,6 @@
       {% endif %}
     </aside>
 
-   <aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <span class="sidebar-title">Struktur Folder</span>
-  </div>
-  {% if full_tree %}
-    {% include 'components/tree_node.html' with nodes=full_tree current_folder_id=current_folder_id %}
-  {% endif %}
-</aside>
     {# ===== KONTEN ===== #}
     <main>
 
