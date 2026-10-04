@@ -28,7 +28,7 @@
       {% if full_tree %}
         <ul class="tree">
           {% for node in full_tree %}
-            {% include 'components/_tree_node.html' with node=node current_folder_id=current_folder_id %}
+            {% include 'components/tree_node.html' with node=node current_folder_id=current_folder_id %}
           {% endfor %}
         </ul>
       {% else %}
@@ -167,8 +167,4 @@
     </main>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>initTree();</script>
 {% endblock %}
