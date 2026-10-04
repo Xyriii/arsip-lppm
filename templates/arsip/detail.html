@@ -3,51 +3,25 @@
 {% block title %}{{ arsip.name }} — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
-<div class="container container-narrow">
+<div class="container">
+
+  {# Tombol Kembali #}
   <a href="{% url 'arsip:list' %}" class="btn btn-ghost btn-sm mb-4">
     <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
     Kembali ke Daftar
   </a>
 
-  <div class="glass-card">
-    <div class="flex justify-between items-start flex-wrap gap-4 mb-6">
-      <div style="min-width:0;">
-        <h1 style="margin-bottom:8px;word-break:break-word;">{{ arsip.name }}</h1>
-        <span class="chip chip-{{ arsip.file_type }}">{{ arsip.get_file_type_display }}</span>
-      </div>
+  {# Header: Judul + Aksi #}
+  <div class="detail-header">
+    <div style="min-width:0;">
+      <h1>{{ arsip.name }}</h1>
+      <span class="chip chip-{{ arsip.file_type }}">{{ arsip.get_file_type_display }}</span>
+    </div>
+    <div class="detail-header-actions">
       <a href="{{ arsip.file.url }}" download class="btn btn-primary">
         <i data-lucide="download" style="width:18px;height:18px;"></i>
         Unduh
       </a>
-    </div>
-
-    <dl class="detail-list">
-      <dt>Tahun</dt>
-      <dd class="num">{{ arsip.folder.year }}</dd>
-
-      <dt>Tipe Berkas</dt>
-      <dd>{{ arsip.get_file_type_display }}</dd>
-
-      <dt>Ukuran</dt>
-      <dd class="num">{{ arsip.size_bytes|filesizeformat }}</dd>
-
-      {% if arsip.uploaded_by %}
-        <dt>Diunggah oleh</dt>
-        <dd>{{ arsip.uploaded_by.get_full_name|default:arsip.uploaded_by.username }}</dd>
-      {% endif %}
-
-      <dt>Tanggal unggah</dt>
-      <dd class="num">{{ arsip.uploaded_at|date:"d M Y, H:i" }}</dd>
-
-      {% if arsip.description %}
-        <dt>Deskripsi</dt>
-        <dd>{{ arsip.description }}</dd>
-      {% endif %}
-    </dl>
-
-    <hr style="border:none;border-top:1px solid var(--color-border);margin:24px 0;">
-
-    <div class="flex justify-end gap-2 flex-wrap">
       <button type="button" class="btn btn-ghost"
               style="color:var(--color-danger);"
               onclick="openModal('modal-hapus-detail')">
@@ -56,9 +30,146 @@
       </button>
     </div>
   </div>
+
+  {# Grid: Preview (kiri) + Metadata (kanan) #}
+  <div class="detail-grid">
+
+    {# ===== PREVIEW ===== #}
+    <aside class="detail-preview">
+      {% with file_name=arsip.file.name|lower %}
+        <div class="preview-frame">
+          {% if '.pdf' in file_name %}
+            <iframe src="{{ arsip.file.url }}#toolbar=0"
+                    title="Preview {{ arsip.name }}"></iframe>
+          {% elif '.jpg' in file_name or '.jpeg' in file_name or '.png' in file_name or '.gif' in file_name or '.webp' in file_name %}
+            <img src="{{ arsip.file.url }}" alt="Preview {{ arsip.name }}">
+          {% else %}
+            <div class="preview-placeholder">
+              <i data-lucide="file-text" style="width:64px;height:64px;"></i>
+              <p style="margin:var(--space-3) 0 0;font-size:14px;">
+                Preview tidak tersedia untuk tipe berkas ini
+              </p>
+            </div>
+          {% endif %}
+        </div>
+      {% endwith %}
+      <p class="preview-caption">{{ arsip.file.name }}</p>
+    </aside>
+
+    {# ===== 6 AREA METADATA ===== #}
+    <div class="detail-metadata">
+
+      {# ---- AREA IDENTITAS ---- #}
+      <details class="metadata-area" open>
+        <summary class="metadata-area-header">Area Identitas</summary>
+        <table class="metadata-table">
+          <tr>
+            <th>Kode Referensi</th>
+            <td class="num">{{ arsip.reference_code|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Judul</th>
+            <td>{{ arsip.name|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Tanggal</th>
+            <td class="num">{{ arsip.date_created|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Level Deskripsi</th>
+            <td>{{ arsip.level_description|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Ukuran &amp; Media</th>
+            <td>{{ arsip.extent_medium|default:"-" }}</td>
+          </tr>
+        </table>
+      </details>
+
+      {# ---- AREA KONTEKS ---- #}
+      <details class="metadata-area" open>
+        <summary class="metadata-area-header">Area Konteks</summary>
+        <table class="metadata-table">
+          <tr>
+            <th>Pencipta</th>
+            <td>{{ arsip.creator|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Repositori</th>
+            <td>{{ arsip.repository|default:"-" }}</td>
+          </tr>
+        </table>
+      </details>
+
+      {# ---- AREA ISI & STRUKTUR ---- #}
+      <details class="metadata-area" open>
+        <summary class="metadata-area-header">Area Isi &amp; Struktur</summary>
+        <table class="metadata-table">
+          <tr>
+            <th>Cakupan dan Isi</th>
+            <td>{{ arsip.scope_content|default:"-" }}</td>
+          </tr>
+        </table>
+      </details>
+
+      {# ---- AREA CATATAN ---- #}
+      <details class="metadata-area" open>
+        <summary class="metadata-area-header">Area Catatan</summary>
+        <table class="metadata-table">
+          <tr>
+            <th>Catatan</th>
+            <td>{{ arsip.note|default:"-" }}</td>
+          </tr>
+        </table>
+      </details>
+
+      {# ---- TITIK TEMU ---- #}
+      <details class="metadata-area" open>
+        <summary class="metadata-area-header">Titik Temu</summary>
+        <table class="metadata-table">
+          <tr>
+            <th>Akses Poin Subjek</th>
+            <td>{{ arsip.subject_access|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Lokasi Fisik</th>
+            <td>{{ arsip.location_physical|default:"-" }}</td>
+          </tr>
+        </table>
+      </details>
+
+      {# ---- METADATA OBJEK DIGITAL ---- #}
+      <details class="metadata-area" open>
+        <summary class="metadata-area-header">Metadata Objek Digital</summary>
+        <table class="metadata-table">
+          <tr>
+            <th>Level Akses</th>
+            <td>{{ arsip.access_level|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Nama Berkas</th>
+            <td style="word-break:break-all;">{{ arsip.file.name|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Jenis Media</th>
+            <td>{{ arsip.media_type|default:"-" }}</td>
+          </tr>
+          <tr>
+            <th>Ukuran</th>
+            <td class="num">{{ arsip.size_bytes|filesizeformat }}</td>
+          </tr>
+          <tr>
+            <th>Terupload</th>
+            <td class="num">{{ arsip.uploaded_at|date:"d M Y H:i" }}</td>
+          </tr>
+        </table>
+      </details>
+
+    </div>
+  </div>
 </div>
 
-{# Modal hapus #}
+{# ===== Modal Hapus ===== #}
 <div class="modal-overlay" id="modal-hapus-detail" role="dialog" aria-modal="true"
      aria-labelledby="modal-title-detail">
   <div class="modal">
