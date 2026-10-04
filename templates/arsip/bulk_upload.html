@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Upload Banyak File — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container container-form">
+  <a href="{% url 'arsip:list' %}" class="btn-ghost">← Kembali</a>
+
+  <h1 style="margin-top:16px;">Upload Banyak File</h1>
+  <p class="text-muted">Pilih folder tujuan, terus pilih banyak file sekaligus.</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding:12px;margin:16px 0;border-radius:8px;background:{% if message.tags == 'error' %}#FFF5F5{% else %}#F0FFF4{% endif %};border-left:3px solid {% if message.tags == 'error' %}#DC2626{% else %}#1E9E5A{% endif %};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="glass-card" style="margin-top:24px;">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small class="text-muted" style="font-size:12px;">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <small style="color:#DC2626;font-size:13px;">{{ field.errors.0 }}</small>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="flex gap-3" style="margin-top:24px;">
+        <a href="{% url 'arsip:list' %}" class="btn btn-secondary">Batal</a>
+        <button type="submit" class="btn btn-primary">Upload Semua</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

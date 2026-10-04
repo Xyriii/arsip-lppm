@@ -17,6 +17,8 @@
       <a href="/arsip/" class="navbar-link {% if active == 'arsip' %}active{% endif %}">Arsip</a>
       <a href="/upload/" class="navbar-link {% if active == 'upload' %}active{% endif %}">Unggah</a>
       <a href="/logout/" class="navbar-link">Keluar</a>
+      <a href="{% url 'arsip:bulk_upload' %}" class="navbar-link">Upload Banyak</a>
+      <a href="{% url 'arsip:folder_upload' %}" class="navbar-link">Upload Folder</a>
 
       <button class="icon-btn" aria-label="Ganti mode gelap" onclick="toggleTheme()">
         <i data-lucide="moon" class="icon-moon" style="width:20px;height:20px;"></i>

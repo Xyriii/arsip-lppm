@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Upload Folder — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container container-form">
+  <a href="{% url 'arsip:list' %}" class="btn-ghost">← Kembali</a>
+
+  <h1 style="margin-top:16px;">Upload Folder (ZIP)</h1>
+  <p class="text-muted">Upload file ZIP berisi folder arsip. Sistem akan otomatis bikin strukturnya.</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding:12px;margin:16px 0;border-radius:8px;background:{% if message.tags == 'error' %}#FFF5F5{% else %}#F0FFF4{% endif %};border-left:3px solid {% if message.tags == 'error' %}#DC2626{% else %}#1E9E5A{% endif %};">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="glass-card" style="margin-top:24px;">
+    <div style="padding:12px;background:#FEF3C7;border-radius:8px;margin-bottom:16px;font-size:13px;">
+      💡 <strong>Cara pakai:</strong> Zip folder arsip lo (misal <code>Penelitian.zip</code>).
+      Struktur di dalam ZIP akan otomatis jadi hierarki fonds → subfonds → series → file.
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small class="text-muted" style="font-size:12px;">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <small style="color:#DC2626;font-size:13px;">{{ field.errors.0 }}</small>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="flex gap-3" style="margin-top:24px;">
+        <a href="{% url 'arsip:list' %}" class="btn btn-secondary">Batal</a>
+        <button type="submit" class="btn btn-primary">Upload ZIP</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -10,4 +10,6 @@ urlpatterns = [
     path('upload/', views.arsip_upload, name='upload'),
     path('<int:pk>/', views.arsip_detail, name='detail'),
     path('<int:pk>/delete/', views.arsip_delete, name='delete'),
+    path('bulk-upload/', views.bulk_upload, name='bulk_upload'),
+    path('folder-upload/', views.folder_upload, name='folder_upload'),
 ]
