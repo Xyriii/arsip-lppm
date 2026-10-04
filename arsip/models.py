@@ -33,22 +33,9 @@ class Folder(models.Model):
     year = models.IntegerField(db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # Field baru (adjustable)
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name='Aktif',
-        help_text='Uncheck untuk soft delete'
-    )
-    order = models.IntegerField(
-        default=0,
-        verbose_name='Urutan'
-    )
-    tags = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name='Tags',
-        help_text='Pisahkan dengan koma (contoh: sk, penting, 2026)'
-    )
+    is_active = models.BooleanField(default=True, verbose_name='Aktif')
+    order = models.IntegerField(default=0, verbose_name='Urutan')
+    tags = models.CharField(max_length=255, blank=True, verbose_name='Tags')
 
     class Meta:
         ordering = ['order', 'name']
@@ -60,7 +47,7 @@ class Folder(models.Model):
 
 
 class Arsip(models.Model):
-    """File arsip (Item)"""
+    """File arsip (Item) - metadata lengkap 6 area ISAD(G)"""
     FILE_TYPE_CHOICES = [
         ('pdf', 'PDF'),
         ('xlsx', 'Excel'),
@@ -68,6 +55,9 @@ class Arsip(models.Model):
         ('lain', 'Lainnya'),
     ]
 
+    # ============================================
+    # FIELD DASAR
+    # ============================================
     name = models.CharField(max_length=255, verbose_name='Nama File')
     folder = models.ForeignKey(
         Folder,
@@ -81,34 +71,94 @@ class Arsip(models.Model):
         default='pdf'
     )
     size_bytes = models.BigIntegerField(default=0)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    is_active = models.BooleanField(default=True, verbose_name='Aktif')
+    tags = models.CharField(max_length=255, blank=True, verbose_name='Tags')
+
+    # ============================================
+    # 1. AREA IDENTITAS
+    # ============================================
     reference_code = models.CharField(
-        max_length=100,
-        blank=True,
+        max_length=100, blank=True,
         verbose_name='Kode Referensi'
     )
     date_created = models.DateField(
         null=True, blank=True,
         verbose_name='Tanggal Arsip'
     )
+    level_description = models.CharField(
+        max_length=50, blank=True, default='item',
+        verbose_name='Level Deskripsi'
+    )
+    extent_medium = models.CharField(
+        max_length=100, blank=True,
+        verbose_name='Ukuran & Media',
+        help_text='Contoh: 1 Lembar, Kertas'
+    )
+
+    # ============================================
+    # 2. AREA KONTEKS
+    # ============================================
     creator = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name='Pencipta Arsip'
+        max_length=255, blank=True,
+        verbose_name='Nama Pencipta',
+        help_text='Contoh: BAN-PT, LPPM UNS'
     )
-    description = models.TextField(blank=True, verbose_name='Keterangan')
-
-    # Field baru (adjustable)
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name='Aktif'
-    )
-    tags = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name='Tags'
+    repository = models.CharField(
+        max_length=255, blank=True,
+        verbose_name='Repositori',
+        help_text='Contoh: Kantor Arsip UNS'
     )
 
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    # ============================================
+    # 3. AREA ISI & STRUKTUR
+    # ============================================
+    description = models.TextField(
+        blank=True,
+        verbose_name='Keterangan Singkat'
+    )
+    scope_content = models.TextField(
+        blank=True,
+        verbose_name='Cakupan & Isi',
+        help_text='Deskripsi isi arsip secara lengkap'
+    )
+
+    # ============================================
+    # 4. AREA CATATAN
+    # ============================================
+    note = models.TextField(
+        blank=True,
+        verbose_name='Catatan'
+    )
+
+    # ============================================
+    # 5. TITIK TEMU
+    # ============================================
+    subject_access = models.TextField(
+        blank=True,
+        verbose_name='Akses Poin Subjek',
+        help_text='Kata kunci pencarian, pisah dengan koma'
+    )
+    location_physical = models.CharField(
+        max_length=255, blank=True,
+        verbose_name='Tempat Akses / Lokasi Fisik',
+        help_text='Contoh: Gd. Eks Perpustakaan Lt.4'
+    )
+
+    # ============================================
+    # 6. METADATA OBJEK DIGITAL
+    # ============================================
+    access_level = models.CharField(
+        max_length=50, blank=True, default='Terbatas',
+        verbose_name='Level Akses',
+        help_text='Contoh: Terbatas, Publik, Internal'
+    )
+    media_type = models.CharField(
+        max_length=50, blank=True,
+        verbose_name='Jenis Media',
+        help_text='Contoh: Teks, Gambar, Audio, Video'
+    )
 
     class Meta:
         ordering = ['-uploaded_at']
