@@ -69,25 +69,18 @@
 
       {# Header folder #}
       <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
-        <div style="min-width:0;">
-          <h1 style="margin-bottom:4px;">
-            {% if current_folder %}{{ current_folder.name }}{% else %}Semua Folder{% endif %}
-          </h1>
-          {% if current_folder.description %}
-            <p class="text-muted" style="margin:0;font-size:14px;">{{ current_folder.description }}</p>
-          {% endif %}
-          {% if current_folder.reference_code or current_folder.year %}
-            <p class="text-faint num" style="margin:4px 0 0;font-size:13px;">
-              {% if current_folder.reference_code %}{{ current_folder.reference_code }}{% endif %}
-              {% if current_folder.year %} &middot; {{ current_folder.year }}{% endif %}
-            </p>
-          {% endif %}
-        </div>
-        <a href="{% url 'arsip:upload' %}" class="btn btn-primary">
-          <i data-lucide="upload" style="width:18px;height:18px;"></i>
-          Unggah
-        </a>
-      </div>
+  <div style="min-width:0;">
+    <h1>{{ current_folder.name }}</h1>
+    <p class="text-muted">{{ current_folder.description }}</p>
+    <p class="text-faint">{{ current_folder.reference_code }} · {{ current_folder.year }}</p>
+  </div>
+  <div class="flex gap-2">
+    {% if current_folder %}
+      <a href="{% url 'arsip:folder_edit' current_folder.pk %}" class="btn btn-secondary">Edit Folder</a>
+    {% endif %}
+    <a href="{% url 'arsip:upload' %}" class="btn btn-primary">Unggah</a>
+  </div>
+</div>
 
       {# Sub-folder #}
       {% if subfolders %}

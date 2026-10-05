@@ -256,3 +256,115 @@ def folder_upload(request):
         form = FolderUploadForm()
     
     return render(request, 'arsip/folder_upload.html', {'form': form})
+@login_required
+def folder_browse(request, pk=None):
+    if pk:
+        current_folder = get_object_or_404(Folder, pk=pk, is_active=True)
+    else:
+        current_folder = None
+
+    if current_folder:
+        subfolders = Folder.objects.filter(parent=current_folder, is_active=True).order_by('order', 'name')
+        arsip_list = Arsip.objects.filter(folder=current_folder, is_active=True).order_by('-uploaded_at')
+    else:
+        subfolders = Folder.objects.filter(parent__isnull=True, is_active=True).order_by('order', 'name')
+        arsip_list = Arsip.objects.none()
+
+    breadcrumb = build_breadcrumb(current_folder) if current_folder else []
+    full_tree = build_full_tree()
+
+    context = {
+        'current_folder': current_folder,
+        'subfolders': subfolders,
+        'arsip_list': arsip_list,
+        'breadcrumb': breadcrumb,
+        'full_tree': full_tree,
+        'current_folder_id': current_folder.id if current_folder else None,
+        'all_folders': Folder.objects.filter(is_active=True).order_by('level', 'name'),  # ← BARU
+    }
+    return render(request, 'arsip/folder_browse.html', context)
+@login_required
+def folder_edit(request, pk):
+    """Edit folder: rename, move, change level"""
+    folder = get_object_or_404(Folder, pk=pk)
+    
+    if request.method == 'POST':
+        folder.name = request.POST.get('name', folder.name)
+        folder.level = request.POST.get('level', folder.level)
+        folder.year = request.POST.get('year', folder.year)
+        folder.reference_code = request.POST.get('reference_code', '')
+        folder.description = request.POST.get('description', '')
+        folder.tags = request.POST.get('tags', '')
+        
+        try:
+            folder.order = int(request.POST.get('order', 0))
+        except ValueError:
+            folder.order = 0
+        
+        # Parent (kalau diubah)
+        parent_id = request.POST.get('parent', '')
+        if parent_id:
+            try:
+                folder.parent = Folder.objects.get(pk=parent_id)
+            except Folder.DoesNotExist:
+                folder.parent = None
+        else:
+            folder.parent = None
+        
+        folder.save()
+        messages.success(request, f'Folder "{folder.name}" berhasil diupdate.')
+        return redirect('arsip:folder', pk=folder.pk)
+    
+    all_folders = Folder.objects.filter(is_active=True).exclude(pk=folder.pk).order_by('level', 'name')
+    return render(request, 'arsip/folder_edit.html', {
+        'folder': folder,
+        'all_folders': all_folders,
+    })
+
+
+@login_required
+def arsip_edit(request, pk):
+    """Edit arsip: nama + metadata 6 area"""
+    arsip = get_object_or_404(Arsip, pk=pk)
+    
+    if request.method == 'POST':
+        arsip.name = request.POST.get('name', arsip.name)
+        arsip.file_type = request.POST.get('file_type', arsip.file_type)
+        arsip.reference_code = request.POST.get('reference_code', '')
+        arsip.creator = request.POST.get('creator', '')
+        arsip.repository = request.POST.get('repository', '')
+        arsip.description = request.POST.get('description', '')
+        arsip.scope_content = request.POST.get('scope_content', '')
+        arsip.note = request.POST.get('note', '')
+        arsip.subject_access = request.POST.get('subject_access', '')
+        arsip.location_physical = request.POST.get('location_physical', '')
+        arsip.access_level = request.POST.get('access_level', 'Terbatas')
+        arsip.media_type = request.POST.get('media_type', '')
+        arsip.extent_medium = request.POST.get('extent_medium', '')
+        arsip.level_description = request.POST.get('level_description', 'item')
+        arsip.tags = request.POST.get('tags', '')
+        
+        date_str = request.POST.get('date_created', '')
+        if date_str:
+            from datetime import datetime
+            try:
+                arsip.date_created = datetime.strptime(date_str, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+        
+        folder_id = request.POST.get('folder', '')
+        if folder_id:
+            try:
+                arsip.folder = Folder.objects.get(pk=folder_id)
+            except Folder.DoesNotExist:
+                pass
+        
+        arsip.save()
+        messages.success(request, f'Arsip "{arsip.name}" berhasil diupdate.')
+        return redirect('arsip:detail', pk=arsip.pk)
+    
+    all_folders = Folder.objects.filter(is_active=True).order_by('level', 'name')
+    return render(request, 'arsip/arsip_edit.html', {
+        'arsip': arsip,
+        'all_folders': all_folders,
+    })

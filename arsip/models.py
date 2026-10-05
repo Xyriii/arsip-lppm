@@ -24,11 +24,7 @@ class Folder(models.Model):
         default='file',
         db_index=True
     )
-    reference_code = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name='Kode Referensi'
-    )
+    reference_code = models.CharField(max_length=100, blank=True, verbose_name='Kode Referensi')
     description = models.TextField(blank=True, verbose_name='Deskripsi')
     year = models.IntegerField(db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -55,38 +51,19 @@ class Arsip(models.Model):
         ('lain', 'Lainnya'),
     ]
 
-    # ============================================
-    # FIELD DASAR
-    # ============================================
+    # ============ FIELD DASAR ============
     name = models.CharField(max_length=255, verbose_name='Nama File')
-    folder = models.ForeignKey(
-        Folder,
-        on_delete=models.CASCADE,
-        related_name='files'
-    )
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='files')
     file = models.FileField(upload_to='arsip/%Y/')
-    file_type = models.CharField(
-        max_length=10,
-        choices=FILE_TYPE_CHOICES,
-        default='pdf'
-    )
+    file_type = models.CharField(max_length=10, choices=FILE_TYPE_CHOICES, default='pdf')
     size_bytes = models.BigIntegerField(default=0)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-
     is_active = models.BooleanField(default=True, verbose_name='Aktif')
     tags = models.CharField(max_length=255, blank=True, verbose_name='Tags')
 
-    # ============================================
-    # 1. AREA IDENTITAS
-    # ============================================
-    reference_code = models.CharField(
-        max_length=100, blank=True,
-        verbose_name='Kode Referensi'
-    )
-    date_created = models.DateField(
-        null=True, blank=True,
-        verbose_name='Tanggal Arsip'
-    )
+    # ============ 1. AREA IDENTITAS ============
+    reference_code = models.CharField(max_length=100, blank=True, verbose_name='Kode Referensi')
+    date_created = models.DateField(null=True, blank=True, verbose_name='Tanggal Arsip')
     level_description = models.CharField(
         max_length=50, blank=True, default='item',
         verbose_name='Level Deskripsi'
@@ -97,9 +74,7 @@ class Arsip(models.Model):
         help_text='Contoh: 1 Lembar, Kertas'
     )
 
-    # ============================================
-    # 2. AREA KONTEKS
-    # ============================================
+    # ============ 2. AREA KONTEKS ============
     creator = models.CharField(
         max_length=255, blank=True,
         verbose_name='Nama Pencipta',
@@ -111,30 +86,18 @@ class Arsip(models.Model):
         help_text='Contoh: Kantor Arsip UNS'
     )
 
-    # ============================================
-    # 3. AREA ISI & STRUKTUR
-    # ============================================
-    description = models.TextField(
-        blank=True,
-        verbose_name='Keterangan Singkat'
-    )
+    # ============ 3. AREA ISI & STRUKTUR ============
+    description = models.TextField(blank=True, verbose_name='Keterangan Singkat')
     scope_content = models.TextField(
         blank=True,
         verbose_name='Cakupan & Isi',
         help_text='Deskripsi isi arsip secara lengkap'
     )
 
-    # ============================================
-    # 4. AREA CATATAN
-    # ============================================
-    note = models.TextField(
-        blank=True,
-        verbose_name='Catatan'
-    )
+    # ============ 4. AREA CATATAN ============
+    note = models.TextField(blank=True, verbose_name='Catatan')
 
-    # ============================================
-    # 5. TITIK TEMU
-    # ============================================
+    # ============ 5. TITIK TEMU ============
     subject_access = models.TextField(
         blank=True,
         verbose_name='Akses Poin Subjek',
@@ -142,17 +105,13 @@ class Arsip(models.Model):
     )
     location_physical = models.CharField(
         max_length=255, blank=True,
-        verbose_name='Tempat Akses / Lokasi Fisik',
-        help_text='Contoh: Gd. Eks Perpustakaan Lt.4'
+        verbose_name='Tempat Akses / Lokasi Fisik'
     )
 
-    # ============================================
-    # 6. METADATA OBJEK DIGITAL
-    # ============================================
+    # ============ 6. METADATA OBJEK DIGITAL ============
     access_level = models.CharField(
         max_length=50, blank=True, default='Terbatas',
-        verbose_name='Level Akses',
-        help_text='Contoh: Terbatas, Publik, Internal'
+        verbose_name='Level Akses'
     )
     media_type = models.CharField(
         max_length=50, blank=True,

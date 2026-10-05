@@ -12,4 +12,6 @@ urlpatterns = [
     path('<int:pk>/delete/', views.arsip_delete, name='delete'),
     path('bulk-upload/', views.bulk_upload, name='bulk_upload'),
     path('folder-upload/', views.folder_upload, name='folder_upload'),
+    path('folder/<int:pk>/edit/', views.folder_edit, name='folder_edit'),
+    path('arsip/<int:pk>/edit/', views.arsip_edit, name='arsip_edit'),
 ]

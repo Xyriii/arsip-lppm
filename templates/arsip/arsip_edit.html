@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Edit Arsip — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container">
+  <a href="{% url 'arsip:detail' arsip.pk %}" class="btn-ghost">← Kembali</a>
+  
+  <h1 style="margin-top:16px;">Edit Arsip</h1>
+  <p class="text-muted">Ubah nama, pindah folder, atau update metadata.</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding:12px;margin:16px 0;border-radius:8px;background:#F0FFF4;border-left:3px solid #1E9E5A;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="glass-card" style="margin-top:24px;">
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Info Dasar -->
+      <h3>📁 Info Dasar</h3>
+      <div class="form-group">
+        <label>Nama File</label>
+        <input type="text" name="name" value="{{ arsip.name }}" class="input" required>
+      </div>
+      <div class="form-group">
+        <label>Pindah ke Folder</label>
+        <select name="folder" class="input">
+          {% for f in all_folders %}
+            <option value="{{ f.pk }}" {% if arsip.folder_id == f.pk %}selected{% endif %}>
+              [{{ f.get_level_display }}] {{ f.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipe File</label>
+        <select name="file_type" class="input">
+          <option value="pdf" {% if arsip.file_type == 'pdf' %}selected{% endif %}>PDF</option>
+          <option value="xlsx" {% if arsip.file_type == 'xlsx' %}selected{% endif %}>Excel</option>
+          <option value="docx" {% if arsip.file_type == 'docx' %}selected{% endif %}>Word</option>
+          <option value="lain" {% if arsip.file_type == 'lain' %}selected{% endif %}>Lainnya</option>
+        </select>
+      </div>
+
+      <!-- 1. Area Identitas -->
+      <h3 style="margin-top:24px;">1️⃣ Area Identitas</h3>
+      <div class="form-group">
+        <label>Kode Referensi</label>
+        <input type="text" name="reference_code" value="{{ arsip.reference_code }}" class="input">
+      </div>
+      <div class="form-group">
+        <label>Tanggal Arsip</label>
+        <input type="date" name="date_created" value="{{ arsip.date_created|date:'Y-m-d' }}" class="input">
+      </div>
+      <div class="form-group">
+        <label>Level Deskripsi</label>
+        <input type="text" name="level_description" value="{{ arsip.level_description }}" class="input">
+      </div>
+      <div class="form-group">
+        <label>Ukuran & Media</label>
+        <input type="text" name="extent_medium" value="{{ arsip.extent_medium }}" class="input" placeholder="1 Lembar, Kertas">
+      </div>
+
+      <!-- 2. Area Konteks -->
+      <h3 style="margin-top:24px;">2️⃣ Area Konteks</h3>
+      <div class="form-group">
+        <label>Nama Pencipta</label>
+        <input type="text" name="creator" value="{{ arsip.creator }}" class="input">
+      </div>
+      <div class="form-group">
+        <label>Repositori</label>
+        <input type="text" name="repository" value="{{ arsip.repository }}" class="input">
+      </div>
+
+      <!-- 3. Area Isi & Struktur -->
+      <h3 style="margin-top:24px;">3️⃣ Area Isi & Struktur</h3>
+      <div class="form-group">
+        <label>Keterangan Singkat</label>
+        <textarea name="description" class="input" rows="3">{{ arsip.description }}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Cakupan & Isi</label>
+        <textarea name="scope_content" class="input" rows="4">{{ arsip.scope_content }}</textarea>
+      </div>
+
+      <!-- 4. Area Catatan -->
+      <h3 style="margin-top:24px;">4️⃣ Area Catatan</h3>
+      <div class="form-group">
+        <label>Catatan</label>
+        <textarea name="note" class="input" rows="3">{{ arsip.note }}</textarea>
+      </div>
+
+      <!-- 5. Titik Temu -->
+      <h3 style="margin-top:24px;">5️⃣ Titik Temu</h3>
+      <div class="form-group">
+        <label>Akses Poin Subjek</label>
+        <textarea name="subject_access" class="input" rows="3">{{ arsip.subject_access }}</textarea>
+      </div>
+      <div class="form-group">
+        <label>Lokasi Fisik</label>
+        <input type="text" name="location_physical" value="{{ arsip.location_physical }}" class="input">
+      </div>
+
+      <!-- 6. Metadata Objek Digital -->
+      <h3 style="margin-top:24px;">6️⃣ Metadata Objek Digital</h3>
+      <div class="form-group">
+        <label>Level Akses</label>
+        <input type="text" name="access_level" value="{{ arsip.access_level }}" class="input">
+      </div>
+      <div class="form-group">
+        <label>Jenis Media</label>
+        <input type="text" name="media_type" value="{{ arsip.media_type }}" class="input" placeholder="Teks, Gambar, dll">
+      </div>
+
+      <!-- Pengaturan -->
+      <h3 style="margin-top:24px;">⚙️ Pengaturan</h3>
+      <div class="form-group">
+        <label>Tags</label>
+        <input type="text" name="tags" value="{{ arsip.tags }}" class="input" placeholder="Pisahkan dengan koma">
+      </div>
+
+      <div class="flex gap-3" style="margin-top:24px;">
+        <a href="{% url 'arsip:detail' arsip.pk %}" class="btn btn-secondary">Batal</a>
+        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

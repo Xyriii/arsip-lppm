@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Edit Folder — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container container-form">
+  <a href="{% url 'arsip:folder' folder.pk %}" class="btn-ghost">← Kembali</a>
+  
+  <h1 style="margin-top:16px;">Edit Folder</h1>
+  <p class="text-muted">Ubah nama, level, atau pindah folder.</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="padding:12px;margin:16px 0;border-radius:8px;background:#F0FFF4;border-left:3px solid #1E9E5A;">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="glass-card" style="margin-top:24px;">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label>Nama Folder</label>
+        <input type="text" name="name" value="{{ folder.name }}" class="input" required>
+      </div>
+
+      <div class="form-group">
+        <label>Level</label>
+        <select name="level" class="input">
+          <option value="fonds" {% if folder.level == 'fonds' %}selected{% endif %}>Fonds</option>
+          <option value="subfonds" {% if folder.level == 'subfonds' %}selected{% endif %}>Sub-Fonds</option>
+          <option value="series" {% if folder.level == 'series' %}selected{% endif %}>Series</option>
+          <option value="file" {% if folder.level == 'file' %}selected{% endif %}>File</option>
+          <option value="item" {% if folder.level == 'item' %}selected{% endif %}>Item</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Folder Induk (Parent)</label>
+        <select name="parent" class="input">
+          <option value="">— Tidak ada (level tertinggi) —</option>
+          {% for f in all_folders %}
+            <option value="{{ f.pk }}" {% if folder.parent_id == f.pk %}selected{% endif %}>
+              [{{ f.get_level_display }}] {{ f.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tahun</label>
+        <input type="number" name="year" value="{{ folder.year }}" class="input" required>
+      </div>
+
+      <div class="form-group">
+        <label>Kode Referensi</label>
+        <input type="text" name="reference_code" value="{{ folder.reference_code }}" class="input">
+      </div>
+
+      <div class="form-group">
+        <label>Deskripsi</label>
+        <textarea name="description" class="input" rows="4">{{ folder.description }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Urutan</label>
+        <input type="number" name="order" value="{{ folder.order }}" class="input">
+      </div>
+
+      <div class="form-group">
+        <label>Tags</label>
+        <input type="text" name="tags" value="{{ folder.tags }}" class="input" placeholder="Pisahkan dengan koma">
+      </div>
+
+      <div class="flex gap-3" style="margin-top:24px;">
+        <a href="{% url 'arsip:folder' folder.pk %}" class="btn btn-secondary">Batal</a>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
