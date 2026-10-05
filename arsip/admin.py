@@ -26,10 +26,37 @@ class FolderAdmin(admin.ModelAdmin):
 @admin.register(Arsip)
 class ArsipAdmin(admin.ModelAdmin):
     list_display = ('name', 'folder', 'file_type', 'size_mb', 'is_active', 'uploaded_at')
-    list_filter = ('file_type', 'folder__year', 'is_active')
-    search_fields = ('name', 'reference_code', 'description', 'creator', 'tags')
+    list_filter = ('file_type', 'folder__year', 'is_active', 'access_level')
+    search_fields = ('name', 'reference_code', 'description', 'creator', 'tags', 'subject_access')
     readonly_fields = ('size_bytes', 'uploaded_at')
-    list_editable = ('is_active',)
+
+    fieldsets = (
+        ('📁 File', {
+            'fields': ('name', 'folder', 'file', 'file_type')
+        }),
+        ('1️⃣ Area Identitas', {
+            'fields': ('reference_code', 'date_created', 'level_description', 'extent_medium')
+        }),
+        ('2️⃣ Area Konteks', {
+            'fields': ('creator', 'repository')
+        }),
+        ('3️⃣ Area Isi & Struktur', {
+            'fields': ('description', 'scope_content')
+        }),
+        ('4️⃣ Area Catatan', {
+            'fields': ('note',)
+        }),
+        ('5️⃣ Titik Temu', {
+            'fields': ('subject_access', 'location_physical')
+        }),
+        ('6️⃣ Metadata Objek Digital', {
+            'fields': ('access_level', 'media_type', 'size_bytes', 'uploaded_at')
+        }),
+        ('Pengaturan', {
+            'fields': ('is_active', 'tags'),
+            'classes': ('collapse',)
+        }),
+    )
 
     def save_model(self, request, obj, form, change):
         if obj.file:
