@@ -15,7 +15,7 @@
 
   <div class="layout-with-sidebar">
 
-    {# ===== SIDEBAR TREE ===== #}
+    {# ===== SIDEBAR TREE (SATU-SATUNYA) ===== #}
     <aside class="sidebar" id="sidebar" aria-label="Struktur folder">
       <div class="sidebar-header">
         <span class="sidebar-title">Struktur Folder</span>
@@ -75,10 +75,16 @@
             </p>
           {% endif %}
         </div>
-        <a href="{% url 'arsip:upload' %}" class="btn btn-primary">
-          <i data-lucide="upload" style="width:18px;height:18px;"></i>
-          Unggah
-        </a>
+        <div class="flex gap-2 flex-wrap">
+          <a href="{% url 'arsip:upload' %}" class="btn btn-secondary">
+            <i data-lucide="upload" style="width:16px;height:16px;"></i>
+            Unggah
+          </a>
+          <a href="{% url 'arsip:bulk_upload' %}" class="btn btn-secondary">
+            <i data-lucide="files" style="width:16px;height:16px;"></i>
+            Bulk Upload
+          </a>
+        </div>
       </div>
 
       {# Sub-folder #}
@@ -132,6 +138,11 @@
                 <tr>
                   <td data-label="Nama">
                     <a href="{% url 'arsip:detail' a.pk %}" style="font-weight:500;">{{ a.name }}</a>
+                    {% if a.description %}
+                      <div class="text-muted" style="font-size:13px;margin-top:2px;">
+                        {{ a.description|truncatechars:80 }}
+                      </div>
+                    {% endif %}
                   </td>
                   <td data-label="Tipe">
                     <span class="chip chip-{{ a.file_type }}">{{ a.get_file_type_display }}</span>

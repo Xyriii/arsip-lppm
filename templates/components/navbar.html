@@ -16,7 +16,11 @@
     <div class="navbar-menu" id="navbar-menu">
       <a href="/arsip/" class="navbar-link {% if active == 'arsip' %}active{% endif %}">Arsip</a>
       <a href="/upload/" class="navbar-link {% if active == 'upload' %}active{% endif %}">Unggah</a>
-      <a href="/logout/" class="navbar-link">Keluar</a>
+    
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="navbar-link">Keluar</button>
+    </form>
 
       <button class="icon-btn" aria-label="Ganti mode gelap" onclick="toggleTheme()">
         <i data-lucide="moon" class="icon-moon" style="width:20px;height:20px;"></i>
