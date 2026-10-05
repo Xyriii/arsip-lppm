@@ -2,55 +2,73 @@
 {% block title %}Upload Banyak File — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
-<div class="container container-form">
+<div class="container">
+  <div class="upload-wrap">
 
-  <div class="page-header">
     <a href="{% url 'arsip:list' %}" class="btn-back">
       <i data-lucide="arrow-left"></i>
       <span>Kembali</span>
     </a>
-    <h1>Upload Banyak File</h1>
-    <p class="text-muted">Pilih folder tujuan, terus pilih banyak file sekaligus.</p>
-  </div>
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
-        <span>{{ message }}</span>
-      </div>
-    {% endfor %}
-  {% endif %}
+    <div class="upload-header">
+      <i data-lucide="upload-cloud"></i>
+      <h1>Upload Banyak File</h1>
+      <p>Pilih folder tujuan, terus pilih banyak file sekaligus.</p>
+    </div>
 
-  <div class="glass-card">
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-
-      {% for field in form %}
-        <div class="form-group">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}
-            <small class="text-muted">{{ field.help_text }}</small>
-          {% endif %}
-          {% if field.errors %}
-            <small class="field-error">{{ field.errors.0 }}</small>
-          {% endif %}
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+          <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
+          <span>{{ message }}</span>
         </div>
       {% endfor %}
+    {% endif %}
 
-      <div class="form-actions">
-        <a href="{% url 'arsip:list' %}" class="btn btn-secondary">
-          <i data-lucide="x"></i>
-          <span>Batal</span>
-        </a>
-        <button type="submit" class="btn btn-primary">
-          <i data-lucide="upload-cloud"></i>
-          <span>Upload Semua</span>
-        </button>
+    <div class="info-box">
+      <i data-lucide="info"></i>
+      <div>
+        <strong>Cara pakai:</strong> Pilih folder tujuan, terus tahan <code>Ctrl</code> (Windows) atau <code>Cmd</code> (Mac) buat milih banyak file sekaligus.
+        Semua file akan masuk ke folder yang lo pilih.
       </div>
-    </form>
-  </div>
+    </div>
 
+    <div class="glass-card">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% for field in form %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <small class="form-help">{{ field.help_text }}</small>
+            {% endif %}
+            {% if field.errors %}
+              <small class="field-error">{{ field.errors.0 }}</small>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <div class="form-actions">
+          <a href="{% url 'arsip:list' %}" class="btn btn-secondary">
+            <i data-lucide="x"></i>
+            <span>Batal</span>
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="upload-cloud"></i>
+            <span>Upload Semua</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
 {% endblock %}

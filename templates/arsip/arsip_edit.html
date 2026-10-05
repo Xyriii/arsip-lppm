@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block title %}Edit Arsip — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="upload-wrap">
+
+    <a href="{% url 'arsip:detail' arsip.pk %}" class="btn-back">
+      <i data-lucide="arrow-left"></i>
+      <span>Kembali ke Detail</span>
+    </a>
+
+    <div class="upload-header">
+      <i data-lucide="file-cog"></i>
+      <h1>Edit Arsip</h1>
+      <p>Ubah nama, pindah folder, atau update metadata.</p>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+          <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="glass-card">
+      <form method="post">
+        {% csrf_token %}
+
+        {# ============ INFO DASAR ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:0 0 16px;">
+          <i data-lucide="file" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>Info Dasar</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="name">Nama File</label>
+          <input type="text" name="name" id="name" value="{{ arsip.name }}" class="input" required>
+        </div>
+
+        <div class="form-group">
+          <label for="folder">Pindah ke Folder</label>
+          <select name="folder" id="folder" class="input">
+            {% for f in all_folders %}
+              <option value="{{ f.pk }}" {% if arsip.folder_id == f.pk %}selected{% endif %}>
+                [{{ f.get_level_display }}] {{ f.name }}
+              </option>
+            {% endfor %}
+          </select>
+          <small class="form-help">Pindah file ini ke folder lain.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="file_type">Tipe File</label>
+          <select name="file_type" id="file_type" class="input">
+            <option value="pdf" {% if arsip.file_type == 'pdf' %}selected{% endif %}>PDF</option>
+            <option value="xlsx" {% if arsip.file_type == 'xlsx' %}selected{% endif %}>Excel</option>
+            <option value="docx" {% if arsip.file_type == 'docx' %}selected{% endif %}>Word</option>
+            <option value="lain" {% if arsip.file_type == 'lain' %}selected{% endif %}>Lainnya</option>
+          </select>
+        </div>
+
+        {# ============ 1. AREA IDENTITAS ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:24px 0 16px;">
+          <i data-lucide="id-card" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>1. Area Identitas</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="reference_code">Kode Referensi</label>
+          <input type="text" name="reference_code" id="reference_code" value="{{ arsip.reference_code }}" class="input">
+        </div>
+
+        <div class="form-group">
+          <label for="date_created">Tanggal Arsip</label>
+          <input type="date" name="date_created" id="date_created" value="{{ arsip.date_created|date:'Y-m-d' }}" class="input">
+        </div>
+
+        <div class="form-group">
+          <label for="level_description">Level Deskripsi</label>
+          <input type="text" name="level_description" id="level_description" value="{{ arsip.level_description }}" class="input" placeholder="item">
+        </div>
+
+        <div class="form-group">
+          <label for="extent_medium">Ukuran & Media</label>
+          <input type="text" name="extent_medium" id="extent_medium" value="{{ arsip.extent_medium }}" class="input" placeholder="Contoh: 1 Lembar, Kertas">
+        </div>
+
+        {# ============ 2. AREA KONTEKS ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:24px 0 16px;">
+          <i data-lucide="building-2" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>2. Area Konteks</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="creator">Nama Pencipta</label>
+          <input type="text" name="creator" id="creator" value="{{ arsip.creator }}" class="input" placeholder="Contoh: LPPM UNS">
+        </div>
+
+        <div class="form-group">
+          <label for="repository">Repositori</label>
+          <input type="text" name="repository" id="repository" value="{{ arsip.repository }}" class="input" placeholder="Contoh: Kantor Arsip UNS">
+        </div>
+
+        {# ============ 3. AREA ISI & STRUKTUR ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:24px 0 16px;">
+          <i data-lucide="file-text" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>3. Area Isi & Struktur</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="description">Keterangan Singkat</label>
+          <textarea name="description" id="description" class="input" rows="3">{{ arsip.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="scope_content">Cakupan & Isi</label>
+          <textarea name="scope_content" id="scope_content" class="input" rows="4">{{ arsip.scope_content }}</textarea>
+        </div>
+
+        {# ============ 4. AREA CATATAN ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:24px 0 16px;">
+          <i data-lucide="sticky-note" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>4. Area Catatan</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="note">Catatan</label>
+          <textarea name="note" id="note" class="input" rows="3">{{ arsip.note }}</textarea>
+        </div>
+
+        {# ============ 5. TITIK TEMU ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:24px 0 16px;">
+          <i data-lucide="key-round" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>5. Titik Temu</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="subject_access">Akses Poin Subjek</label>
+          <textarea name="subject_access" id="subject_access" class="input" rows="3">{{ arsip.subject_access }}</textarea>
+          <small class="form-help">Kata kunci pencarian, pisahkan dengan koma.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="location_physical">Lokasi Fisik</label>
+          <input type="text" name="location_physical" id="location_physical" value="{{ arsip.location_physical }}" class="input" placeholder="Contoh: Gd. Eks Perpustakaan Lt.4">
+        </div>
+
+        {# ============ 6. METADATA OBJEK DIGITAL ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:24px 0 16px;">
+          <i data-lucide="hard-drive" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>6. Metadata Objek Digital</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="access_level">Level Akses</label>
+          <input type="text" name="access_level" id="access_level" value="{{ arsip.access_level }}" class="input" placeholder="Terbatas / Publik / Internal">
+        </div>
+
+        <div class="form-group">
+          <label for="media_type">Jenis Media</label>
+          <input type="text" name="media_type" id="media_type" value="{{ arsip.media_type }}" class="input" placeholder="Teks / Gambar / Audio / Video">
+        </div>
+
+        {# ============ PENGATURAN ============ #}
+        <h3 style="display:flex;align-items:center;gap:8px;font-size:15px;margin:24px 0 16px;">
+          <i data-lucide="settings" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span>Pengaturan</span>
+        </h3>
+
+        <div class="form-group">
+          <label for="tags">Tags</label>
+          <input type="text" name="tags" id="tags" value="{{ arsip.tags }}" class="input" placeholder="Pisahkan dengan koma">
+        </div>
+
+        <div class="form-actions">
+          <a href="{% url 'arsip:detail' arsip.pk %}" class="btn btn-secondary">
+            <i data-lucide="x"></i>
+            <span>Batal</span>
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="save"></i>
+            <span>Simpan Perubahan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
+{% endblock %}

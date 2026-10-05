@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Reset Password — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="upload-wrap" style="max-width:520px;">
+
+    <a href="{% url 'arsip:user_list' %}" class="btn-back">
+      <i data-lucide="arrow-left"></i>
+      <span>Kembali</span>
+    </a>
+
+    <div class="upload-header">
+      <i data-lucide="key-round"></i>
+      <h1>Reset Password</h1>
+      <p>Bikin password baru untuk pengguna</p>
+    </div>
+
+    <div class="glass-card">
+      <div class="info-box" style="margin-bottom:20px;">
+        <i data-lucide="user"></i>
+        <div>
+          <strong>Pengguna:</strong> {{ target_user.username }}
+          {% if target_user.get_full_name %}
+            <br>
+            <span style="font-size:12px;color:var(--color-ink-muted);">{{ target_user.get_full_name }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="info-box" style="background:#FEF3C7;border-color:#FDE68A;border-left-color:#D97706;">
+        <i data-lucide="alert-triangle" style="color:#D97706;"></i>
+        <div>
+          <strong style="color:#92400E;">Perhatian</strong>
+          <p style="margin:6px 0 0;color:#78350F;font-size:13px;">
+            Password baru akan digenerate otomatis dan hanya muncul <strong>sekali</strong>.
+            Pastikan Anda mencatatnya sebelum menutup halaman ini.
+          </p>
+        </div>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="form-actions" style="border-top:none;padding-top:0;margin-top:0;">
+          <a href="{% url 'arsip:user_list' %}" class="btn btn-secondary">
+            <i data-lucide="x"></i>
+            <span>Batal</span>
+          </a>
+          <button type="submit" class="btn btn-primary" style="background:linear-gradient(180deg,#F59E0B 0%,#D97706 100%);">
+            <i data-lucide="refresh-cw"></i>
+            <span>Reset Password</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
+{% endblock %}

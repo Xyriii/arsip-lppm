@@ -62,6 +62,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+# ============================================
+# CUSTOM ERROR HANDLERS
+# ============================================
+handler404 = 'arsip.views.custom_404'
+handler500 = 'arsip.views.custom_500'
 
 ROOT_URLCONF = 'arsip_project.urls'
 
@@ -150,5 +155,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Login redirect
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/arsip/'
+LOGIN_REDIRECT_URL = '/'   # akan di-redirect dinamis
 LOGOUT_REDIRECT_URL = '/login/'

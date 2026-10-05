@@ -1,153 +1,266 @@
 {% extends 'base.html' %}
-
-{% block title %}Daftar Arsip — Arsip LPPM UNS{% endblock %}
+{% block title %}Dashboard — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
 <div class="container">
-  <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
-  <div>
-    <h1 style="margin-bottom:4px;">Daftar Arsip</h1>
-    <p class="text-muted" style="margin:0;font-size:14px;">
-      Unit Kearsipan II LPPM &mdash; UNS
-    </p>
-  </div>
-  <div class="flex gap-2 flex-wrap">
-    <a href="{% url 'arsip:browse' %}" class="btn btn-secondary">
-      <i data-lucide="folder-tree" style="width:18px;height:18px;"></i>
-      Telusuri Folder
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+    {% include 'components/pagination.html' %}
+  {% endif %}
+
+  {# ============ WELCOME HEADER ============ #}
+  {% if user.is_authenticated and user.is_staff %}
+  <div class="flex gap-2">
+    <a href="{% url 'arsip:export_excel' %}{% if query or tahun_aktif or kategori_aktif %}?{% if query %}q={{ query }}&{% endif %}{% if tahun_aktif %}tahun={{ tahun_aktif }}&{% endif %}{% if kategori_aktif %}kategori={{ kategori_aktif }}{% endif %}{% endif %}" class="btn btn-secondary">
+      <i data-lucide="file-spreadsheet"></i>
+      <span>Export Excel</span>
+    </a>
+    <a href="{% url 'arsip:bulk_upload' %}" class="btn btn-secondary">
+      <i data-lucide="upload-cloud"></i>
+      <span>Bulk Upload</span>
     </a>
     <a href="{% url 'arsip:upload' %}" class="btn btn-primary">
-      <i data-lucide="upload" style="width:18px;height:18px;"></i>
-      Unggah Berkas
+      <i data-lucide="upload"></i>
+      <span>Unggah</span>
     </a>
   </div>
-</div>
+{% endif %}
 
-  {# Filter #}
-  <form method="get" class="glass-card" style="margin-bottom:24px;">
-    <div class="flex flex-wrap gap-4 items-center">
-      <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0;">
-        <label for="q">Cari</label>
-        <input type="search" id="q" name="q" class="input"
-               placeholder="Cari nama arsip..."
-               value="{{ request.GET.q }}">
+  {# ============ STAT CARDS ============ #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+    
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(0,88,168,0.1);color:#0058A8;">
+        <i data-lucide="file-text"></i>
       </div>
-      <div class="form-group" style="min-width:140px;margin-bottom:0;">
-        <label for="tahun">Tahun</label>
-        <select id="tahun" name="tahun" class="select">
-          <option value="">Semua</option>
-          {% for y in tahun_list %}
-            <option value="{{ y }}" {% if request.GET.tahun == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
-          {% endfor %}
-        </select>
+      <div>
+        <div class="stat-num">{{ total_arsip }}</div>
+        <div class="stat-label">Total Arsip</div>
       </div>
-      <div class="form-group" style="min-width:140px;margin-bottom:0;">
-        <label for="file_type">Tipe</label>
-        <select id="file_type" name="file_type" class="select">
-          <option value="">Semua</option>
-          <option value="pdf"  {% if request.GET.file_type == 'pdf' %}selected{% endif %}>PDF</option>
-          <option value="xlsx" {% if request.GET.file_type == 'xlsx' %}selected{% endif %}>XLSX</option>
-          <option value="docx" {% if request.GET.file_type == 'docx' %}selected{% endif %}>DOCX</option>
-          <option value="other" {% if request.GET.file_type == 'other' %}selected{% endif %}>Lainnya</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-secondary">
-        <i data-lucide="filter" style="width:18px;height:18px;"></i>
-        Filter
-      </button>
     </div>
-  </form>
 
-  {% if arsip_list %}
-    <div class="table-container">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Tahun</th>
-            <th>Tipe</th>
-            <th style="text-align:right;">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for a in arsip_list %}
-            <tr>
-              <td data-label="Nama">
-                <a href="{% url 'arsip:detail' a.pk %}" style="font-weight:500;">{{ a.name }}</a>
-                {% if a.description %}
-                  <div class="text-muted" style="font-size:13px;margin-top:2px;">
-                    {{ a.description|truncatechars:80 }}
-                  </div>
-                {% endif %}
-              </td>
-              <td data-label="Tahun" class="num">{{ a.folder.year }}</td>
-              <td data-label="Tipe">
-                <span class="chip chip-{{ a.file_type }}">{{ a.get_file_type_display }}</span>
-              </td>
-              <td data-label="Aksi" style="text-align:right;white-space:nowrap;">
-                <a href="{{ a.file.url }}" download class="btn btn-ghost btn-sm">
-                  <i data-lucide="download" style="width:16px;height:16px;"></i>
-                  Unduh
-                </a>
-                <button type="button"
-                        class="btn btn-ghost btn-sm"
-                        style="color:var(--color-danger);"
-                        onclick="openModal('modal-hapus-{{ a.pk }}')"
-                        aria-label="Hapus arsip {{ a.name }}">
-                  <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
-                  Hapus
-                </button>
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(30,158,90,0.1);color:#1E9E5A;">
+        <i data-lucide="folder"></i>
+      </div>
+      <div>
+        <div class="stat-num">{{ total_folder }}</div>
+        <div class="stat-label">Total Folder</div>
+      </div>
     </div>
-  {% else %}
-    <div class="glass-card empty-state">
-      <i data-lucide="inbox" style="width:48px;height:48px;"></i>
-      <h3>Belum ada arsip</h3>
-      <p>Arsip akan muncul di sini setelah diunggah.</p>
-      <a href="{% url 'arsip:upload' %}" class="btn btn-primary">Tambah Arsip</a>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(217,119,6,0.1);color:#D97706;">
+        <i data-lucide="hard-drive"></i>
+      </div>
+      <div>
+        <div class="stat-num">{{ total_size|filesizeformat }}</div>
+        <div class="stat-label">Total Ukuran</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(139,92,246,0.1);color:#7C3AED;">
+        <i data-lucide="trending-up"></i>
+      </div>
+      <div>
+        <div class="stat-num">{{ recent_arsip|length }}</div>
+        <div class="stat-label">Upload Terbaru</div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ============ 2 KOLOM: BREAKDOWN + RECENT ============ #}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+
+    {# Breakdown per Tipe #}
+    <div class="glass-card" style="padding:24px;">
+      <h3 style="font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px;">
+        <i data-lucide="pie-chart" style="width:18px;height:18px;color:var(--color-primary);"></i>
+        <span>Arsip per Tipe</span>
+      </h3>
+
+      <div class="breakdown-list">
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="chip chip-pdf">PDF</span>
+          </div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio pdf_count total_arsip 100 %}%;background:#0058A8;"></div>
+          </div>
+          <div class="breakdown-num">{{ pdf_count }}</div>
+        </div>
+
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="chip chip-xlsx">Excel</span>
+          </div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio xlsx_count total_arsip 100 %}%;background:#1E9E5A;"></div>
+          </div>
+          <div class="breakdown-num">{{ xlsx_count }}</div>
+        </div>
+
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="chip chip-docx">Word</span>
+          </div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio docx_count total_arsip 100 %}%;background:#7C3AED;"></div>
+          </div>
+          <div class="breakdown-num">{{ docx_count }}</div>
+        </div>
+
+        <div class="breakdown-item">
+          <div class="breakdown-label">
+            <span class="chip">Lainnya</span>
+          </div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio lain_count total_arsip 100 %}%;background:#64748B;"></div>
+          </div>
+          <div class="breakdown-num">{{ lain_count }}</div>
+        </div>
+      </div>
+    </div>
+
+    {# Breakdown per Level #}
+    <div class="glass-card" style="padding:24px;">
+      <h3 style="font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px;">
+        <i data-lucide="layers" style="width:18px;height:18px;color:var(--color-primary);"></i>
+        <span>Folder per Level</span>
+      </h3>
+
+      <div class="breakdown-list">
+        <div class="breakdown-item">
+          <div class="breakdown-label"><span style="font-size:13px;">Fonds</span></div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio level_fonds total_folder 100 %}%;background:#0058A8;"></div>
+          </div>
+          <div class="breakdown-num">{{ level_fonds }}</div>
+        </div>
+
+        <div class="breakdown-item">
+          <div class="breakdown-label"><span style="font-size:13px;">Sub-Fonds</span></div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio level_subfonds total_folder 100 %}%;background:#2E7BC8;"></div>
+          </div>
+          <div class="breakdown-num">{{ level_subfonds }}</div>
+        </div>
+
+        <div class="breakdown-item">
+          <div class="breakdown-label"><span style="font-size:13px;">Series</span></div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio level_series total_folder 100 %}%;background:#1E9E5A;"></div>
+          </div>
+          <div class="breakdown-num">{{ level_series }}</div>
+        </div>
+
+        <div class="breakdown-item">
+          <div class="breakdown-label"><span style="font-size:13px;">File</span></div>
+          <div class="breakdown-bar">
+            <div class="breakdown-fill" style="width:{% widthratio level_file total_folder 100 %}%;background:#D97706;"></div>
+          </div>
+          <div class="breakdown-num">{{ level_file }}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ============ ARSIP PER TAHUN (GRAFIK BAR) ============ #}
+  {% if arsip_per_tahun %}
+    <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+      <h3 style="font-size:16px;margin:0 0 20px;display:flex;align-items:center;gap:8px;">
+        <i data-lucide="bar-chart-3" style="width:18px;height:18px;color:var(--color-primary);"></i>
+        <span>Arsip per Tahun</span>
+      </h3>
+
+      <div class="year-chart">
+        {% for item in arsip_per_tahun %}
+          <div class="year-bar-wrap">
+            <div class="year-bar" style="height:{{ item.count }}0px;background:linear-gradient(180deg,#2E7BC8,#0058A8);">
+              <span class="year-bar-num">{{ item.count }}</span>
+            </div>
+            <div class="year-bar-label">{{ item.folder__year }}</div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   {% endif %}
-</div>
 
-{# ===== Modal Konfirmasi Hapus (satu per arsip) #}
-{% for a in arsip_list %}
-  <div class="modal-overlay" id="modal-hapus-{{ a.pk }}" role="dialog" aria-modal="true"
-       aria-labelledby="modal-title-{{ a.pk }}">
-    <div class="modal">
-      <button type="button" class="modal-close" aria-label="Tutup dialog"
-              onclick="closeModal('modal-hapus-{{ a.pk }}')">
-        <i data-lucide="x" style="width:18px;height:18px;"></i>
-      </button>
-
-      <div class="modal-icon">
-        <i data-lucide="alert-triangle" style="width:28px;height:28px;"></i>
+  {# ============ RECENT ARSIP ============ #}
+  {% if recent_arsip %}
+    <div class="glass-card" style="padding:24px;margin-bottom:24px;">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="font-size:16px;margin:0;display:flex;align-items:center;gap:8px;">
+          <i data-lucide="clock" style="width:18px;height:18px;color:var(--color-primary);"></i>
+          <span>Upload Terbaru</span>
+        </h3>
+        <a href="{% url 'arsip:browse' %}" style="font-size:13px;color:var(--color-primary);text-decoration:none;font-weight:500;">
+          Lihat Semua →
+        </a>
       </div>
 
-      <h3 class="modal-title" id="modal-title-{{ a.pk }}">Hapus arsip ini?</h3>
-      <p class="modal-desc">
-        Arsip <strong>{{ a.name }}</strong> akan dihapus permanen.
-        Tindakan ini tidak bisa dibatalkan.
-      </p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        {% for a in recent_arsip %}
+          <a href="{% url 'arsip:detail' a.pk %}" class="recent-row">
+            <div class="recent-icon chip-{{ a.file_type }}">
+              <i data-lucide="file-text"></i>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:14px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                {{ a.name }}
+              </div>
+              <div class="text-muted" style="font-size:12px;">
+                {{ a.folder.name }} · {{ a.size_bytes|filesizeformat }} · {{ a.uploaded_at|date:"d M Y H:i" }}
+              </div>
+            </div>
+            <i data-lucide="chevron-right" style="color:var(--color-ink-faint);"></i>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
 
-      <form method="post" action="{% url 'arsip:delete' a.pk %}">
-        {% csrf_token %}
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary"
-                  onclick="closeModal('modal-hapus-{{ a.pk }}')"
-                  data-autofocus>
-            Batal
-          </button>
-          <button type="submit" class="btn btn-danger">
-            <i data-lucide="trash-2" style="width:18px;height:18px;"></i>
-            Hapus
-          </button>
-        </div>
-      </form>
+  {# ============ QUICK ACTIONS ============ #}
+  <div class="glass-card" style="padding:24px;">
+    <h3 style="font-size:16px;margin:0 0 16px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="zap" style="width:18px;height:18px;color:var(--color-primary);"></i>
+      <span>Aksi Cepat</span>
+    </h3>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+      <a href="{% url 'arsip:list' %}" class="quick-action">
+        <i data-lucide="list"></i>
+        <span>Daftar Arsip</span>
+      </a>
+      <a href="{% url 'arsip:browse' %}" class="quick-action">
+        <i data-lucide="folder-tree"></i>
+        <span>Jelajah Hierarki</span>
+      </a>
+      <a href="{% url 'arsip:folder_upload' %}" class="quick-action">
+        <i data-lucide="folder-up"></i>
+        <span>Upload Folder ZIP</span>
+      </a>
+      <a href="{% url 'arsip:user_list' %}" class="quick-action">
+        <i data-lucide="users"></i>
+        <span>Kelola Pengguna</span>
+      </a>
     </div>
   </div>
-{% endfor %}
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
 {% endblock %}

@@ -1,36 +1,28 @@
 {% extends 'base.html' %}
-
-{% block title %}
-  {% if current_folder %}{{ current_folder.name }}{% else %}Browse Arsip{% endif %} — Arsip LPPM UNS
-{% endblock %}
+{% block title %}{% if current_folder %}{{ current_folder.name }}{% else %}Jelajah Arsip{% endif %} — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
 <div class="container">
 
-  {# Toggle sidebar khusus mobile #}
-  <button type="button" class="btn btn-secondary sidebar-toggle-mobile" onclick="toggleSidebar()">
-    <i data-lucide="panel-left" style="width:16px;height:16px;"></i>
-    Tampilkan Struktur Folder
-  </button>
-
-  <div class="layout-with-sidebar">
-
-    {# ===== SIDEBAR TREE (SATU-SATUNYA) ===== #}
-    <aside class="sidebar" id="sidebar" aria-label="Struktur folder">
-      <div class="sidebar-header">
-        <span class="sidebar-title">Struktur Folder</span>
-        <a href="{% url 'arsip:browse' %}" class="btn btn-ghost btn-sm"
-           style="height:auto;padding:4px 8px;" aria-label="Kembali ke root">
-          <i data-lucide="home" style="width:14px;height:14px;"></i>
-        </a>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
+        <span>{{ message }}</span>
       </div>
+    {% endfor %}
+  {% endif %}
 
+  <div class="browse-wrap">
+
+    {# ============ SIDEBAR: TREE ============ #}
+    <aside class="browse-sidebar">
+      <div class="sidebar-title">
+        <i data-lucide="network"></i>
+        <span>Struktur Arsip</span>
+      </div>
       {% if full_tree %}
-        <ul class="tree">
-          {% for node in full_tree %}
-            {% include 'components/tree_node.html' with node=node current_folder_id=current_folder_id %}
-          {% endfor %}
-        </ul>
+        {% include 'components/tree_node.html' with nodes=full_tree current_folder_id=current_folder_id %}
       {% else %}
         <p class="text-muted" style="font-size:13px;text-align:center;padding:16px 0;">
           Belum ada folder.
@@ -38,30 +30,34 @@
       {% endif %}
     </aside>
 
-    {# ===== KONTEN ===== #}
-    <main>
+    {# ============ KONTEN ============ #}
+    <main class="browse-main">
 
-      {# Breadcrumb #}
-      {% if breadcrumb %}
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="{% url 'arsip:browse' %}" class="breadcrumb-item">
-            <i data-lucide="home" style="width:14px;height:14px;vertical-align:-2px;"></i>
-            Root
-          </a>
-          {% for crumb in breadcrumb %}
-            <span class="breadcrumb-sep">/</span>
-            {% if forloop.last %}
-              <span class="breadcrumb-item is-current" aria-current="page">{{ crumb.name }}</span>
-            {% else %}
-              <a href="{% url 'arsip:folder' crumb.pk %}" class="breadcrumb-item">{{ crumb.name }}</a>
-            {% endif %}
-          {% endfor %}
-        </nav>
-      {% endif %}
+      {# Search Bar Prominent #}
+      <form method="get" action="{% url 'arsip:list' %}" class="search-prominent">
+        <span class="search-icon"><i data-lucide="search"></i></span>
+        <input type="text" name="q" placeholder="Cari arsip...">
+      </form>
 
-      {# Header folder #}
+      {# Breadcrumb Modern #}
+      <nav class="crumb">
+        <a href="{% url 'arsip:browse' %}">
+          <i data-lucide="home"></i>
+          <span>Root</span>
+        </a>
+        {% for crumb in breadcrumb %}
+          <span class="crumb-sep">/</span>
+          {% if forloop.last %}
+            <span class="crumb-current">{{ crumb.name }}</span>
+          {% else %}
+            <a href="{% url 'arsip:folder' crumb.pk %}">{{ crumb.name }}</a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+
+      {# Header #}
       <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
-        <div style="min-width:0;">
+        <div>
           <h1 style="margin-bottom:4px;">
             {% if current_folder %}{{ current_folder.name }}{% else %}Semua Folder{% endif %}
           </h1>
@@ -69,20 +65,22 @@
             <p class="text-muted" style="margin:0;font-size:14px;">{{ current_folder.description }}</p>
           {% endif %}
           {% if current_folder.reference_code or current_folder.year %}
-            <p class="text-faint num" style="margin:4px 0 0;font-size:13px;">
+            <p class="text-faint" style="margin:4px 0 0;font-size:13px;">
               {% if current_folder.reference_code %}{{ current_folder.reference_code }}{% endif %}
               {% if current_folder.year %} &middot; {{ current_folder.year }}{% endif %}
             </p>
           {% endif %}
         </div>
-        <div class="flex gap-2 flex-wrap">
-          <a href="{% url 'arsip:upload' %}" class="btn btn-secondary">
-            <i data-lucide="upload" style="width:16px;height:16px;"></i>
-            Unggah
-          </a>
-          <a href="{% url 'arsip:bulk_upload' %}" class="btn btn-secondary">
-            <i data-lucide="files" style="width:16px;height:16px;"></i>
-            Bulk Upload
+        <div class="flex gap-2">
+          {% if current_folder %}
+            <a href="{% url 'arsip:folder_edit' current_folder.pk %}" class="btn btn-secondary">
+              <i data-lucide="pencil"></i>
+              <span>Edit</span>
+            </a>
+          {% endif %}
+          <a href="{% url 'arsip:upload' %}" class="btn btn-primary">
+            <i data-lucide="upload"></i>
+            <span>Unggah</span>
           </a>
         </div>
       </div>
@@ -97,26 +95,22 @@
           {% for f in subfolders %}
             <a href="{% url 'arsip:folder' f.pk %}" class="folder-card">
               <div class="folder-card-icon">
-                <i data-lucide="folder" style="width:22px;height:22px;"></i>
+                <i data-lucide="folder"></i>
               </div>
               <div class="folder-card-body">
                 <div class="folder-card-title" title="{{ f.name }}">{{ f.name }}</div>
                 <div class="folder-card-meta">
-                  {% if f.year %}<span class="num">{{ f.year }}</span>{% endif %}
-                  {% if f.reference_code %}
-                    {% if f.year %}<span>&middot;</span>{% endif %}
-                    <span>{{ f.reference_code }}</span>
-                  {% endif %}
+                  <span>{{ f.get_level_display }}</span>
+                  {% if f.year %}<span>&middot;</span><span>{{ f.year }}</span>{% endif %}
                 </div>
               </div>
-              <i data-lucide="chevron-right"
-                 style="width:16px;height:16px;color:var(--color-ink-faint);flex-shrink:0;"></i>
+              <i data-lucide="chevron-right" style="color:var(--color-ink-faint);"></i>
             </a>
           {% endfor %}
         </div>
       {% endif %}
 
-      {# Arsip di folder ini #}
+      {# Arsip (file) #}
       {% if arsip_list %}
         <div class="section-heading">
           <h2>Arsip</h2>
@@ -134,43 +128,47 @@
               </tr>
             </thead>
             <tbody>
-              {% for a in arsip_list %}
-                <tr>
-                  <td data-label="Nama">
-                    <a href="{% url 'arsip:detail' a.pk %}" style="font-weight:500;">{{ a.name }}</a>
-                    {% if a.description %}
-                      <div class="text-muted" style="font-size:13px;margin-top:2px;">
-                        {{ a.description|truncatechars:80 }}
-                      </div>
-                    {% endif %}
-                  </td>
-                  <td data-label="Tipe">
-                    <span class="chip chip-{{ a.file_type }}">{{ a.get_file_type_display }}</span>
-                  </td>
-                  <td data-label="Ukuran" class="num">{{ a.size_bytes|filesizeformat }}</td>
-                  <td data-label="Tanggal" class="num">{{ a.uploaded_at|date:"d M Y" }}</td>
-                  <td data-label="Aksi" style="text-align:right;white-space:nowrap;">
-                    <a href="{{ a.file.url }}" download class="btn btn-ghost btn-sm">
-                      <i data-lucide="download" style="width:16px;height:16px;"></i>
-                      Unduh
-                    </a>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
+  {% for a in arsip_list %}
+    <tr>
+      <td data-label="Aksi" style="text-align:right;white-space:nowrap;">
+  <a href="{{ a.file.url }}" download class="row-action" title="Unduh">
+    <i data-lucide="download"></i>
+  </a>
+  {% if user.is_staff or user.is_superuser %}
+    <a href="{% url 'arsip:arsip_edit' a.pk %}" class="row-action" title="Edit">
+      <i data-lucide="pencil"></i>
+    </a>
+  {% endif %}
+</td>
+      <td data-label="Tipe">
+        <span class="chip chip-{{ a.file_type }}">{{ a.get_file_type_display }}</span>
+      </td>
+      <td data-label="Ukuran">{{ a.size_bytes|filesizeformat }}</td>
+      <td data-label="Tanggal">{{ a.uploaded_at|date:"d M Y" }}</td>
+      <td data-label="Aksi" style="text-align:right;white-space:nowrap;">
+        <a href="{{ a.file.url }}" download class="row-action" title="Unduh">
+          <i data-lucide="download"></i>
+        </a>
+        <a href="{% url 'arsip:arsip_edit' a.pk %}" class="row-action" title="Edit">
+          <i data-lucide="pencil"></i>
+        </a>
+      </td>
+    </tr>
+  {% endfor %}
+</tbody>
           </table>
         </div>
       {% endif %}
 
-      {# Empty state #}
+      {# Empty State #}
       {% if not subfolders and not arsip_list %}
         <div class="glass-card empty-state">
-          <i data-lucide="folder-open" style="width:48px;height:48px;"></i>
+          <i data-lucide="folder-open"></i>
           <h3>Folder ini kosong</h3>
           <p>Belum ada sub-folder atau arsip di dalam folder ini.</p>
           <a href="{% url 'arsip:upload' %}" class="btn btn-primary">
-            <i data-lucide="upload" style="width:18px;height:18px;"></i>
-            Unggah Arsip
+            <i data-lucide="upload"></i>
+            <span>Unggah Arsip</span>
           </a>
         </div>
       {% endif %}
@@ -178,4 +176,13 @@
     </main>
   </div>
 </div>
+
+<script>
+  // Re-init Lucide setelah DOM ready
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  });
+</script>
 {% endblock %}

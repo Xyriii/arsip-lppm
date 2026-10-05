@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Kelola Pengguna — Arsip LPPM UNS{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
+        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {# Header #}
+  <div class="result-header">
+    <div>
+      <h1 style="margin-bottom:4px;">Kelola Pengguna</h1>
+      <p class="result-count">
+        <strong>{{ users|length }}</strong> pengguna terdaftar
+      </p>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'arsip:user_create' %}" class="btn btn-primary">
+        <i data-lucide="user-plus"></i>
+        <span>Tambah Pengguna</span>
+      </a>
+    </div>
+  </div>
+
+  {# Breadcrumb #}
+  <nav class="crumb" style="margin-bottom:16px;">
+    <a href="{% url 'arsip:list' %}">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </a>
+    <span class="crumb-sep">/</span>
+    <span class="crumb-current">Kelola Pengguna</span>
+  </nav>
+
+  {# Statistik #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+    {% with total_admin=users|length %}
+      <div class="glass-card" style="padding:20px;text-align:center;">
+        <i data-lucide="users" style="width:28px;height:28px;color:var(--color-primary);margin-bottom:8px;"></i>
+        <div style="font-size:28px;font-weight:700;color:var(--color-primary);">{{ users|length }}</div>
+        <div class="text-muted" style="font-size:13px;">Total Pengguna</div>
+      </div>
+    {% endwith %}
+  </div>
+
+  {# Tabel Pengguna #}
+  {% if users %}
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Nama Lengkap</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th style="text-align:right;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr>
+              <td data-label="Username">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div style="width:36px;height:36px;border-radius:50%;background:rgba(0,88,168,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <i data-lucide="user" style="width:16px;height:16px;color:var(--color-primary);"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:14px;">{{ u.username }}</div>
+                    {% if u == request.user %}
+                      <div class="text-muted" style="font-size:11px;">(Anda)</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td data-label="Nama">{{ u.get_full_name|default:"-" }}</td>
+              <td data-label="Email">{{ u.email|default:"-" }}</td>
+              <td data-label="Role">
+                {% if u.is_superuser %}
+                  <span class="chip" style="background:#FEE2E2;color:#991B1B;">
+                    <i data-lucide="crown" style="width:12px;height:12px;"></i>
+                    Owner
+                  </span>
+                {% elif u.is_staff %}
+                  <span class="chip" style="background:#DBEAFE;color:#1E40AF;">
+                    <i data-lucide="shield" style="width:12px;height:12px;"></i>
+                    Admin
+                  </span>
+                {% else %}
+                  <span class="chip" style="background:#F1F5F9;color:#475569;">
+                    <i data-lucide="user" style="width:12px;height:12px;"></i>
+                    User
+                  </span>
+                {% endif %}
+              </td>
+              <td data-label="Status">
+                {% if u.is_active %}
+                  <span class="chip" style="background:#DCFCE7;color:#15803D;">
+                    <i data-lucide="check-circle" style="width:12px;height:12px;"></i>
+                    Aktif
+                  </span>
+                {% else %}
+                  <span class="chip" style="background:#FEE2E2;color:#991B1B;">
+                    <i data-lucide="x-circle" style="width:12px;height:12px;"></i>
+                    Nonaktif
+                  </span>
+                {% endif %}
+              </td>
+              <td data-label="Aksi" style="text-align:right;white-space:nowrap;">
+                <a href="{% url 'arsip:user_reset' u.pk %}" class="row-action" title="Reset Password">
+                  <i data-lucide="key-round"></i>
+                </a>
+                {% if u != request.user %}
+                  <a href="{% url 'arsip:user_toggle' u.pk %}" class="row-action {% if u.is_active %}danger{% endif %}" title="{% if u.is_active %}Nonaktifkan{% else %}Aktifkan{% endif %}">
+                    <i data-lucide="{% if u.is_active %}user-x{% else %}user-check{% endif %}"></i>
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="glass-card empty-state">
+      <i data-lucide="users"></i>
+      <h3>Belum ada pengguna</h3>
+      <p>Tambahkan pengguna pertama untuk mulai berkolaborasi.</p>
+      <a href="{% url 'arsip:user_create' %}" class="btn btn-primary">
+        <i data-lucide="user-plus"></i>
+        <span>Tambah Pengguna</span>
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
+{% endblock %}

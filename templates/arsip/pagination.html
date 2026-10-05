@@ -1,0 +1,51 @@
+{% if page_obj.has_other_pages %}
+  <nav class="pagination-nav" aria-label="Pagination">
+    
+    {# Prev #}
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if tahun_aktif %}&tahun={{ tahun_aktif }}{% endif %}{% if kategori_aktif %}&kategori={{ kategori_aktif }}{% endif %}" class="page-btn">
+        <i data-lucide="chevron-left"></i>
+        <span>Prev</span>
+      </a>
+    {% else %}
+      <span class="page-btn disabled">
+        <i data-lucide="chevron-left"></i>
+        <span>Prev</span>
+      </span>
+    {% endif %}
+
+    {# Page Numbers #}
+    <div class="page-numbers">
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="page-num active">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if tahun_aktif %}&tahun={{ tahun_aktif }}{% endif %}{% if kategori_aktif %}&kategori={{ kategori_aktif }}{% endif %}" class="page-num">{{ num }}</a>
+        {% elif num == 1 or num == page_obj.paginator.num_pages %}
+          <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if tahun_aktif %}&tahun={{ tahun_aktif }}{% endif %}{% if kategori_aktif %}&kategori={{ kategori_aktif }}{% endif %}" class="page-num">{{ num }}</a>
+        {% elif num == page_obj.number|add:'-3' or num == page_obj.number|add:'3' %}
+          <span class="page-ellipsis">…</span>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {# Next #}
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if tahun_aktif %}&tahun={{ tahun_aktif }}{% endif %}{% if kategori_aktif %}&kategori={{ kategori_aktif }}{% endif %}" class="page-btn">
+        <span>Next</span>
+        <i data-lucide="chevron-right"></i>
+      </a>
+    {% else %}
+      <span class="page-btn disabled">
+        <span>Next</span>
+        <i data-lucide="chevron-right"></i>
+      </span>
+    {% endif %}
+
+  </nav>
+
+  <div class="pagination-info">
+    Halaman <strong>{{ page_obj.number }}</strong> dari <strong>{{ page_obj.paginator.num_pages }}</strong>
+    · Total <strong>{{ paginator.count }}</strong> arsip
+  </div>
+{% endif %}

@@ -1,27 +1,32 @@
-{# Recursive partial — context: node, current_folder_id #}
-<li class="tree-item {% if node.pk == current_folder_id %}is-current{% endif %}">
-  <div class="tree-row {% if node.pk == current_folder_id %}is-active{% endif %}">
-    {% if node.children %}
-      <button type="button" class="tree-toggle" aria-expanded="false"
-              aria-label="Buka/tutup subfolder {{ node.name }}">
-        <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
-      </button>
-    {% else %}
-      <span class="tree-toggle is-hidden" aria-hidden="true"></span>
-    {% endif %}
+<ul class="tree-list">
+  {% for node in nodes %}
+    <li class="tree-item">
+      <div class="tree-row {% if node.folder.pk == current_folder_id %}is-active{% endif %}">
 
-    <a href="{% url 'arsip:folder' node.pk %}" class="tree-link" title="{{ node.name }}">
-      <i data-lucide="{% if node.pk == current_folder_id %}folder-open{% else %}folder{% endif %}"
-         style="width:16px;height:16px;"></i>
-      <span>{{ node.name }}</span>
-    </a>
-  </div>
+        {% if node.children %}
+          <button type="button" class="tree-toggle" data-target="node-{{ node.folder.pk }}">
+            <i data-lucide="chevron-right"></i>
+          </button>
+        {% else %}
+          <span class="tree-toggle empty"></span>
+        {% endif %}
 
-  {% if node.children %}
-    <ul class="tree-children">
-      {% for child in node.children %}
-        {% include 'components/tree_node.html' with node=child current_folder_id=current_folder_id %}
-      {% endfor %}
-    </ul>
-  {% endif %}
-</li>
+        <a href="{% url 'arsip:folder' node.folder.pk %}" class="tree-link">
+          {% if node.children %}
+            <i data-lucide="folder-open"></i>
+          {% else %}
+            <i data-lucide="folder"></i>
+          {% endif %}
+          <span class="tree-label">{{ node.folder.name }}</span>
+        </a>
+
+      </div>
+
+      {% if node.children %}
+        <div class="tree-children" id="node-{{ node.folder.pk }}" style="display:none;">
+          {% include 'components/tree_node.html' with nodes=node.children current_folder_id=current_folder_id %}
+        </div>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>

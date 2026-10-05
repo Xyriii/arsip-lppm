@@ -4,53 +4,83 @@
 {% block title %}Masuk — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
-<div class="container container-form" style="padding-top:var(--space-12);">
-  <div class="glass-card">
-    <div class="text-center mb-6">
-      <img src="{% static 'img/logo-uns.svg' %}" alt="Logo LPPM UNS"
-           style="height:64px;margin:0 auto 16px;">
-      <h1 style="font-size:24px;margin-bottom:8px;">Masuk ke Arsip LPPM</h1>
-      <p class="text-muted" style="font-size:14px;margin:0;">
-        Unit Kearsipan II LPPM &mdash; UNS
-      </p>
+<div class="login-page">
+  <div class="login-card">
+
+    {# Brand #}
+    <div class="login-brand">
+      <img src="{% static 'img/logo-uns.svg' %}" alt="UNS">
+      <h1>Arsip LPPM UNS</h1>
+      <p>Masuk untuk mengakses sistem kearsipan</p>
     </div>
 
+    {# Error Message #}
     {% if form.errors %}
-      <div class="toast toast-danger" style="position:static;margin-bottom:16px;animation:none;">
-        <span class="toast-icon">
-          <i data-lucide="alert-circle" style="width:18px;height:18px;"></i>
-        </span>
-        <div class="toast-body">Username atau password salah.</div>
+      <div class="login-alert">
+        <i data-lucide="alert-circle"></i>
+        <span>Username atau password salah. Coba lagi.</span>
       </div>
     {% endif %}
 
-    <form method="post" action="{% url 'login' %}">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="login-alert">
+          <i data-lucide="alert-circle"></i>
+          <span>{{ message }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {# Form #}
+    <form method="post" class="login-form">
       {% csrf_token %}
-      <input type="hidden" name="next" value="{{ next }}">
 
-      <div class="form-group">
-        <label for="id_username">Username</label>
-        <input type="text" id="id_username" name="username" class="input"
-               placeholder="Masukkan username" required autofocus
-               autocomplete="username">
+      <div class="login-form-group">
+        <label for="username">Username</label>
+        <span class="input-icon"><i data-lucide="user"></i></span>
+        <input type="text" name="username" id="username" class="input" placeholder="Masukkan username" required autofocus autocomplete="username">
       </div>
 
-      <div class="form-group">
-        <label for="id_password">Password</label>
-        <input type="password" id="id_password" name="password" class="input"
-               placeholder="Masukkan password" required
-               autocomplete="current-password">
+      <div class="login-form-group">
+        <label for="password">Password</label>
+        <span class="input-icon"><i data-lucide="lock"></i></span>
+        <div class="password-wrap">
+          <input type="password" name="password" id="password" class="input" placeholder="Masukkan password" required autocomplete="current-password">
+          <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password">
+            <i data-lucide="eye" id="eyeIcon"></i>
+          </button>
+        </div>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">
-        <i data-lucide="log-in" style="width:18px;height:18px;"></i>
-        Masuk
+      <button type="submit" class="btn btn-primary login-submit">
+        <i data-lucide="log-in"></i>
+        <span>Masuk</span>
       </button>
     </form>
 
-    <p class="text-faint text-center" style="font-size:12px;margin-top:16px;margin-bottom:0;">
-      Hanya untuk staff Unit Kearsipan II LPPM
-    </p>
+    <div class="login-footer">
+      © 2026 Unit Kearsipan II LPPM — Universitas Sebelas Maret
+    </div>
+
   </div>
 </div>
+
+<script>
+  function togglePassword() {
+    const input = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.setAttribute('data-lucide', 'eye-off');
+    } else {
+      input.type = 'password';
+      icon.setAttribute('data-lucide', 'eye');
+    }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
 {% endblock %}

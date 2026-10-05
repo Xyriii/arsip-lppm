@@ -1,0 +1,25 @@
+
+{% extends 'base.html' %}
+{% block title %}404 — Halaman Tidak Ditemukan{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="error-page">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Halaman Tidak Ditemukan</h1>
+    <p class="error-desc">
+      Halaman yang Anda cari tidak ada, sudah dipindahkan, atau Anda salah ketik URL.
+    </p>
+    <div class="error-actions">
+      <a href="{% url 'home' %}" class="btn btn-primary">
+        <i data-lucide="home"></i>
+        <span>Kembali ke Beranda</span>
+      </a>
+      <a href="{% url 'arsip:list' %}" class="btn btn-secondary">
+        <i data-lucide="list"></i>
+        <span>Lihat Daftar Arsip</span>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

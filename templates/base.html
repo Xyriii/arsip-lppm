@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Arsip LPPM UNS{% endblock %}</title>
   <meta name="description" content="Sistem Kearsipan Digital Unit Kearsipan II LPPM Universitas Sebelas Maret">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 
   {# Dark mode: set sebelum body render biar gak flicker #}
   <script>
@@ -31,34 +32,14 @@
   {% block head_extra %}{% endblock %}
 </head>
 <body>
-    {% include 'components/navbar.html' %}
+  {# Navbar SELALU muncul (public & logged in) #}
+  {% include 'components/navbar.html' %}
 
-  {# Django messages → otomatis jadi toast via JS #}
-  {% if messages %}
-    <div id="django-messages" hidden>
-      {% for message in messages %}
-        <span data-message="{{ message }}" data-type="{{ message.tags|default:'info' }}"></span>
-      {% endfor %}
-    </div>
-  {% endif %}
+  {% block content %}{% endblock %}
 
-  <main class="main-content">
-    {% block content %}{% endblock %}
-  </main>
-
+  {# Footer SELALU muncul #}
   {% include 'components/footer.html' %}
 
-  {# Lucide Icons #}
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-{# Cegah browser restore scroll position secara instan (biar animasi enter keliatan) #}
-<script>
-  if ('scrollRestoration' in history) {
-    history.scrollRestoration = 'manual';
-  }
-</script>
-
-<script src="{% static 'js/main.js' %}"></script>
-  {% block scripts %}{% endblock %}
+  <script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

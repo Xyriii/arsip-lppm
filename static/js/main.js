@@ -2,7 +2,14 @@
 /* ============================================================
    Website Arsip LPPM UNS — main.js
    ============================================================ */
-
+// ============================================
+// LUCIDE ICONS
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+});
 /* ===========================================================
    DARK MODE
    ============================================================ */
@@ -146,33 +153,36 @@ document.addEventListener('keydown', function (e) {
    TREE SIDEBAR
    ============================================================ */
 function initTree() {
-  document.querySelectorAll('.tree-toggle:not(.is-hidden)').forEach(btn => {
-    btn.addEventListener('click', function (e) {
+  document.querySelectorAll('.tree-toggle:not(.empty)').forEach(function (toggle) {
+    toggle.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
 
-      const item = btn.closest('.tree-item');
-      if (!item) return;
+      const targetId = this.dataset.target;
+      const target = document.getElementById(targetId);
+      if (!target) return;
 
-      const isOpen = item.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      const isOpen = target.style.display !== 'none';
+      if (isOpen) {
+        target.style.display = 'none';
+        this.classList.remove('open');
+      } else {
+        target.style.display = 'block';
+        this.classList.add('open');
+      }
     });
   });
 
-  // Auto-expand path ke current folder
+  // Auto-expand ke folder yang aktif
   const activeRow = document.querySelector('.tree-row.is-active');
   if (activeRow) {
-    let parent = activeRow.parentElement.closest('.tree-children');
+    let parent = activeRow.closest('.tree-children');
     while (parent) {
-      const item = parent.closest('.tree-item');
-      if (item) {
-        item.classList.add('is-open');
-        const toggle = item.querySelector(':scope > .tree-row > .tree-toggle');
-        if (toggle && !toggle.classList.contains('is-hidden')) {
-          toggle.setAttribute('aria-expanded', 'true');
-        }
-      }
-      parent = parent.parentElement.closest('.tree-children');
+      parent.style.display = 'block';
+      const parentLi = parent.parentElement;
+      const toggle = parentLi ? parentLi.querySelector('.tree-toggle') : null;
+      if (toggle) toggle.classList.add('open');
+      parent = parent.parentElement ? parent.parentElement.closest('.tree-children') : null;
     }
   }
 }
