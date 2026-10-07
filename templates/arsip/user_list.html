@@ -1,62 +1,54 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Kelola Pengguna — Arsip LPPM UNS{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/page-user.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container">
+<div class="user-page">
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
-        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
-        <span>{{ message }}</span>
-      </div>
-    {% endfor %}
-  {% endif %}
+  {# BREADCRUMB #}
+  <nav class="user-crumb">
+    <a href="{% url 'arsip:list' %}">
+      <i data-lucide="home"></i>
+      <span>Dashboard</span>
+    </a>
+    <span class="user-crumb-sep"><i data-lucide="chevron-right"></i></span>
+    <span class="user-crumb-current">Kelola Pengguna</span>
+  </nav>
 
-  {# Header #}
-  <div class="result-header">
-    <div>
-      <h1 style="margin-bottom:4px;">Kelola Pengguna</h1>
-      <p class="result-count">
-        <strong>{{ users|length }}</strong> pengguna terdaftar
-      </p>
+  {# HEADER #}
+  <div class="user-head">
+    <div class="user-head-left">
+      <h1 class="user-title">Kelola Pengguna</h1>
+      <p class="user-subtitle"><strong>{{ users|length }}</strong> pengguna terdaftar</p>
     </div>
-    <div class="flex gap-2">
-      <a href="{% url 'arsip:user_create' %}" class="btn btn-primary">
+    <div class="user-head-actions">
+      <a href="{% url 'arsip:user_create' %}" class="btn-v2 btn-v2-primary">
         <i data-lucide="user-plus"></i>
         <span>Tambah Pengguna</span>
       </a>
     </div>
   </div>
 
-  {# Breadcrumb #}
-  <nav class="crumb" style="margin-bottom:16px;">
-    <a href="{% url 'arsip:list' %}">
-      <i data-lucide="home"></i>
-      <span>Home</span>
-    </a>
-    <span class="crumb-sep">/</span>
-    <span class="crumb-current">Kelola Pengguna</span>
-  </nav>
-
-  {# Statistik #}
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
-    {% with total_admin=users|length %}
-      <div class="glass-card" style="padding:20px;text-align:center;">
-        <i data-lucide="users" style="width:28px;height:28px;color:var(--color-primary);margin-bottom:8px;"></i>
-        <div style="font-size:28px;font-weight:700;color:var(--color-primary);">{{ users|length }}</div>
-        <div class="text-muted" style="font-size:13px;">Total Pengguna</div>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert-v2 alert-{{ message.tags }}" style="margin-bottom:var(--space-4);">
+        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
+        <span>{{ message }}</span>
       </div>
-    {% endwith %}
-  </div>
+    {% endfor %}
+  {% endif %}
 
-  {# Tabel Pengguna #}
+  {# TABLE #}
   {% if users %}
-    <div class="table-container">
-      <table class="table">
+    <div class="user-table-wrap">
+      <table class="user-table">
         <thead>
           <tr>
-            <th>Username</th>
+            <th>Pengguna</th>
             <th>Nama Lengkap</th>
             <th>Email</th>
             <th>Role</th>
@@ -67,15 +59,15 @@
         <tbody>
           {% for u in users %}
             <tr>
-              <td data-label="Username">
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <div style="width:36px;height:36px;border-radius:50%;background:rgba(0,88,168,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <i data-lucide="user" style="width:16px;height:16px;color:var(--color-primary);"></i>
+              <td data-label="Pengguna">
+                <div class="user-cell">
+                  <div class="user-avatar">
+                    <i data-lucide="user"></i>
                   </div>
                   <div>
-                    <div style="font-weight:600;font-size:14px;">{{ u.username }}</div>
+                    <div class="user-name">{{ u.username }}</div>
                     {% if u == request.user %}
-                      <div class="text-muted" style="font-size:11px;">(Anda)</div>
+                      <div class="user-you">(Anda)</div>
                     {% endif %}
                   </div>
                 </div>
@@ -84,41 +76,41 @@
               <td data-label="Email">{{ u.email|default:"-" }}</td>
               <td data-label="Role">
                 {% if u.is_superuser %}
-                  <span class="chip" style="background:#FEE2E2;color:#991B1B;">
-                    <i data-lucide="crown" style="width:12px;height:12px;"></i>
-                    Owner
+                  <span class="role-chip role-owner">
+                    <i data-lucide="crown"></i>
+                    <span>Owner</span>
                   </span>
                 {% elif u.is_staff %}
-                  <span class="chip" style="background:#DBEAFE;color:#1E40AF;">
-                    <i data-lucide="shield" style="width:12px;height:12px;"></i>
-                    Admin
+                  <span class="role-chip role-admin">
+                    <i data-lucide="shield"></i>
+                    <span>Admin</span>
                   </span>
                 {% else %}
-                  <span class="chip" style="background:#F1F5F9;color:#475569;">
-                    <i data-lucide="user" style="width:12px;height:12px;"></i>
-                    User
+                  <span class="role-chip role-user">
+                    <i data-lucide="user"></i>
+                    <span>User</span>
                   </span>
                 {% endif %}
               </td>
               <td data-label="Status">
                 {% if u.is_active %}
-                  <span class="chip" style="background:#DCFCE7;color:#15803D;">
-                    <i data-lucide="check-circle" style="width:12px;height:12px;"></i>
-                    Aktif
+                  <span class="status-chip status-active">
+                    <span class="status-dot"></span>
+                    <span>Aktif</span>
                   </span>
                 {% else %}
-                  <span class="chip" style="background:#FEE2E2;color:#991B1B;">
-                    <i data-lucide="x-circle" style="width:12px;height:12px;"></i>
-                    Nonaktif
+                  <span class="status-chip status-inactive">
+                    <span class="status-dot"></span>
+                    <span>Nonaktif</span>
                   </span>
                 {% endif %}
               </td>
               <td data-label="Aksi" style="text-align:right;white-space:nowrap;">
-                <a href="{% url 'arsip:user_reset' u.pk %}" class="row-action" title="Reset Password">
+                <a href="{% url 'arsip:user_reset' u.pk %}" class="user-action" title="Reset Password">
                   <i data-lucide="key-round"></i>
                 </a>
                 {% if u != request.user %}
-                  <a href="{% url 'arsip:user_toggle' u.pk %}" class="row-action {% if u.is_active %}danger{% endif %}" title="{% if u.is_active %}Nonaktifkan{% else %}Aktifkan{% endif %}">
+                  <a href="{% url 'arsip:user_toggle' u.pk %}" class="user-action {% if u.is_active %}user-action-danger{% endif %}" title="{% if u.is_active %}Nonaktifkan{% else %}Aktifkan{% endif %}">
                     <i data-lucide="{% if u.is_active %}user-x{% else %}user-check{% endif %}"></i>
                   </a>
                 {% endif %}
@@ -129,11 +121,11 @@
       </table>
     </div>
   {% else %}
-    <div class="glass-card empty-state">
+    <div class="user-empty">
       <i data-lucide="users"></i>
       <h3>Belum ada pengguna</h3>
       <p>Tambahkan pengguna pertama untuk mulai berkolaborasi.</p>
-      <a href="{% url 'arsip:user_create' %}" class="btn btn-primary">
+      <a href="{% url 'arsip:user_create' %}" class="btn-v2 btn-v2-primary">
         <i data-lucide="user-plus"></i>
         <span>Tambah Pengguna</span>
       </a>

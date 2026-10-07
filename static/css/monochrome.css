@@ -1,0 +1,382 @@
+/* ============================================================
+   MONOCHROME OVERRIDE
+   Semua jadi grayscale KECUALI:
+   - Logo (image, gak kena CSS)
+   - Tombol besar (primary, danger, login submit)
+   - Chip PDF (tulisan PDF + dot)
+   ============================================================ */
+
+/* ============================================================
+   1. VARIABEL — LIGHT MODE (GRAYSCALE)
+   ============================================================ */
+:root {
+  --bg-base: #FAFAFA;
+  --bg-surface: #FFFFFF;
+  --bg-hover: #F0F0F0;
+
+  --border-subtle: #E5E5E5;
+  --border-strong: #CCCCCC;
+  --border-focus: #1A1A1A;
+
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-tertiary: #888888;
+  --text-inverse: #FFFFFF;
+
+  --accent: #1A1A1A;
+  --accent-hover: #000000;
+  --accent-soft: rgba(0, 0, 0, 0.05);
+  --accent-border: rgba(0, 0, 0, 0.1);
+
+  --danger-bg: #F0F0F0;
+  --danger-text: #555555;
+  --success-bg: #F0F0F0;
+  --success-text: #555555;
+  --warning-bg: #F0F0F0;
+  --warning-text: #555555;
+}
+
+/* ============================================================
+   2. VARIABEL — DARK MODE (GRAYSCALE)
+   ============================================================ */
+.dark {
+  --bg-base: #0A0A0A;
+  --bg-surface: #141414;
+  --bg-hover: #1F1F1F;
+
+  --border-subtle: #262626;
+  --border-strong: #404040;
+  --border-focus: #F5F5F5;
+
+  --text-primary: #F5F5F5;
+  --text-secondary: #A0A0A0;
+  --text-tertiary: #707070;
+
+  --accent: #F5F5F5;
+  --accent-hover: #FFFFFF;
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  --accent-border: rgba(255, 255, 255, 0.15);
+
+  --danger-bg: rgba(255, 255, 255, 0.06);
+  --danger-text: #A0A0A0;
+  --success-bg: rgba(255, 255, 255, 0.06);
+  --success-text: #A0A0A0;
+  --warning-bg: rgba(255, 255, 255, 0.06);
+  --warning-text: #A0A0A0;
+}
+
+/* ============================================================
+   3. WHITELIST — ELEMEN YANG TETAP BERWARNA
+   ============================================================ */
+
+/* ---------- Tombol Primary (UNS Blue) ---------- */
+.btn-v2-primary,
+.login-submit,
+.login-submit-v2 {
+  background: #0058A8 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0, 88, 168, 0.25) !important;
+}
+.btn-v2-primary:hover,
+.login-submit:hover,
+.login-submit-v2:hover {
+  background: #003D75 !important;
+  box-shadow: 0 8px 24px rgba(0, 88, 168, 0.35) !important;
+}
+.btn-v2-primary [data-lucide],
+.login-submit [data-lucide],
+.login-submit-v2 [data-lucide] {
+  color: #FFFFFF !important;
+}
+
+/* ---------- Tombol Danger (Merah) ---------- */
+.btn-v2-danger {
+  background: #DC2626 !important;
+  color: #FFFFFF !important;
+  border-color: #DC2626 !important;
+}
+.btn-v2-danger:hover {
+  background: #B91C1C !important;
+  border-color: #B91C1C !important;
+}
+.btn-v2-danger [data-lucide] {
+  color: #FFFFFF !important;
+}
+
+/* ---------- Chip PDF (Merah) ---------- */
+.chip-pdf {
+  color: #DC2626 !important;
+}
+.dark .chip-pdf {
+  color: #F87171 !important;
+}
+.dot-pdf {
+  background: #DC2626 !important;
+}
+.dark .dot-pdf {
+  background: #F87171 !important;
+}
+
+/* ============================================================
+   4. OVERRIDE — ELEMEN YANG HARUS JADI GRAYSCALE
+   ============================================================ */
+
+/* ---------- Chip XLSX / DOCX / Lain → Abu ---------- */
+.chip-xlsx,
+.chip-docx,
+.chip-lain {
+  color: var(--text-secondary) !important;
+}
+.dot-xlsx,
+.dot-docx,
+.dot-lain {
+  background: var(--text-tertiary) !important;
+}
+
+/* ---------- Role Chip → Abu ---------- */
+.role-owner,
+.role-admin,
+.role-user {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+}
+.role-owner [data-lucide],
+.role-admin [data-lucide],
+.role-user [data-lucide] {
+  color: var(--text-tertiary) !important;
+}
+
+/* ---------- Status Chip → Abu ---------- */
+.status-active,
+.status-inactive {
+  color: var(--text-secondary) !important;
+}
+.status-active .status-dot {
+  background: var(--text-secondary) !important;
+  box-shadow: none !important;
+  animation: none !important;
+}
+.status-inactive .status-dot {
+  background: var(--text-tertiary) !important;
+  animation: none !important;
+}
+
+/* ---------- Log Icon → Abu ---------- */
+.log-icon-login,
+.log-icon-logout,
+.log-icon-upload,
+.log-icon-edit,
+.log-icon-delete,
+.log-icon-create,
+.log-icon-move,
+.log-icon-download,
+.log-icon-activity,
+.log-icon-login,
+.log-icon-login {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Log Chip → Abu ---------- */
+.log-chip-delete,
+.log-chip-edit,
+.log-chip-upload,
+.log-chip-login,
+.log-chip-logout,
+.log-chip-create,
+.log-chip-move,
+.log-chip-download {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Hero Accent "Kapan Saja" → Gradient Abu ---------- */
+.hero-v3-accent {
+  background: linear-gradient(135deg,
+    #888888 0%,
+    #1A1A1A 50%,
+    #555555 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.dark .hero-v3-accent {
+  background: linear-gradient(135deg,
+    #A0A0A0 0%,
+    #F5F5F5 50%,
+    #707070 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* ---------- Dot Pulsing (Badge, Section) → Abu ---------- */
+.hero-v3-badge-dot,
+.section-tag-dot,
+.badge-pulse {
+  background: var(--text-tertiary) !important;
+  animation: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- Doc Badge "Terverifikasi" → Abu ---------- */
+.doc-badge {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+}
+.doc-badge [data-lucide] {
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Doc Icon → Abu ---------- */
+.doc-icon {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Icon Element (folder, file, stat, dll) → Abu ---------- */
+.folder-icon-v2,
+.recent-icon-v2,
+.file-icon,
+.stat-icon,
+.stat-icon-v2,
+.stat-icon-blue,
+.stat-icon-green,
+.stat-icon-amber,
+.stat-icon-purple,
+.quick-icon-v2,
+.quick-icon-blue,
+.quick-icon-green,
+.step-icon-v2,
+.link-icon-v2,
+.user-avatar,
+.user-avatar-v2,
+.nav-lin-avatar,
+.edit-header-icon,
+.form-header-icon-v2,
+.modal-icon {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Hover State Icons → Abu juga ---------- */
+.folder-card-v2:hover .folder-icon-v2,
+.recent-card-v2:hover .recent-icon-v2,
+.quick-card-v2:hover .quick-icon-v2,
+.stat-card:hover .stat-icon,
+.stat-v2:hover .stat-icon-v2,
+.user-table tbody tr:hover .user-avatar,
+.log-item:hover .log-icon,
+.doc-card-1:hover .doc-icon {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+  transform: none !important;
+}
+
+/* ---------- Filter Chip (Active Filters) → Abu ---------- */
+.filter-chip {
+  background: var(--bg-hover) !important;
+  border-color: var(--border-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+.filter-chip a,
+.filter-chip [data-lucide] {
+  color: var(--text-tertiary) !important;
+}
+
+/* ---------- Login Alert → Abu ---------- */
+.login-alert {
+  background: var(--bg-hover) !important;
+  border: 1px solid var(--border-subtle) !important;
+  color: var(--text-secondary) !important;
+}
+.login-alert [data-lucide] {
+  color: var(--text-tertiary) !important;
+}
+
+/* ---------- Alert V2 (Form) → Abu ---------- */
+.alert-v2,
+.alert-error,
+.alert-success,
+.alert-warning {
+  background: var(--bg-hover) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+/* ---------- Info Box → Abu ---------- */
+.info-box-v2 {
+  background: var(--bg-hover) !important;
+  border-color: var(--border-subtle) !important;
+}
+.info-box-v2 [data-lucide] {
+  color: var(--text-tertiary) !important;
+}
+
+/* ---------- Section Icon (Edit Form, dsb) → Abu ---------- */
+.edit-section-header [data-lucide],
+.meta-header-left [data-lucide],
+.breakdown-header [data-lucide],
+.sidebar-title [data-lucide],
+.tree-side-header [data-lucide],
+.filter-side-header [data-lucide],
+.filter-header-v2 [data-lucide],
+.tree-header-v2 [data-lucide],
+.browse-section-head [data-lucide] {
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Doc Stack Badge → Abu ---------- */
+.doc-badge,
+.doc-badge [data-lucide] {
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- Background Gradient (login, error page) → Abu ---------- */
+.login-page::before,
+.error-page-v2::before {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 0, 0, 0.04), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(0, 0, 0, 0.03), transparent 40%) !important;
+}
+.dark .login-page::before,
+.dark .error-page-v2::before {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.06), transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.04), transparent 40%) !important;
+}
+
+/* ---------- Hero Glow (kanan) → Abu ---------- */
+.hero-v3-glow {
+  background: radial-gradient(circle at center,
+    rgba(0, 0, 0, 0.06) 0%,
+    rgba(0, 0, 0, 0.03) 30%,
+    transparent 70%) !important;
+}
+.dark .hero-v3-glow {
+  background: radial-gradient(circle at center,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.03) 30%,
+    transparent 70%) !important;
+}
+
+/* ---------- Chip Role Owner — crown icon → abu ---------- */
+.role-chip [data-lucide] {
+  color: currentColor !important;
+}
+
+/* ============================================================
+   FIX — Tombol Search Hero (kontras di dark mode)
+   ============================================================ */
+.hero-v3-search-btn {
+  background: var(--text-primary) !important;
+  color: var(--bg-base) !important;
+}
+.hero-v3-search-btn:hover {
+  background: var(--text-secondary) !important;
+  color: var(--bg-base) !important;
+}
+.hero-v3-search-btn [data-lucide] {
+  color: var(--bg-base) !important;
+  stroke: var(--bg-base) !important;
+}

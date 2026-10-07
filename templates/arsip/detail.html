@@ -1,37 +1,37 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}{{ arsip.name }} — Arsip LPPM UNS{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/page-detail.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container">
+<div class="detail-page">
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
-        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
-        <span>{{ message }}</span>
-      </div>
-    {% endfor %}
-  {% endif %}
-
-  {# Breadcrumb #}
-  <nav class="crumb">
-    <a href="{% url 'arsip:browse' %}">
+  {# BREADCRUMB #}
+  <nav class="detail-crumb">
+    <a href="{% url 'arsip:browse' %}" class="crumb-item">
       <i data-lucide="home"></i>
       <span>Root</span>
     </a>
     {% if arsip.folder.parent %}
-      <span class="crumb-sep">/</span>
-      <a href="{% url 'arsip:folder' arsip.folder.parent.pk %}">{{ arsip.folder.parent.name }}</a>
+      <span class="crumb-sep"><i data-lucide="chevron-right"></i></span>
+      <a href="{% url 'arsip:folder' arsip.folder.parent.pk %}" class="crumb-item">
+        {{ arsip.folder.parent.name }}
+      </a>
     {% endif %}
-    <span class="crumb-sep">/</span>
-    <a href="{% url 'arsip:folder' arsip.folder.pk %}">{{ arsip.folder.name }}</a>
-    <span class="crumb-sep">/</span>
+    <span class="crumb-sep"><i data-lucide="chevron-right"></i></span>
+    <a href="{% url 'arsip:folder' arsip.folder.pk %}" class="crumb-item">
+      {{ arsip.folder.name }}
+    </a>
+    <span class="crumb-sep"><i data-lucide="chevron-right"></i></span>
     <span class="crumb-current">{{ arsip.name|truncatechars:40 }}</span>
   </nav>
 
-  <div class="detail-wrap">
+  <div class="detail-layout">
 
-    {# ============ PREVIEW (KIRI, STICKY) ============ #}
+    {# PREVIEW #}
     <aside class="preview-pane">
       <div class="preview-frame">
         {% if arsip.file_type == 'pdf' %}
@@ -39,198 +39,207 @@
         {% elif arsip.file_type == 'docx' %}
           <div class="preview-placeholder">
             <i data-lucide="file-text"></i>
-            <p>Preview tidak tersedia untuk file Word.</p>
-            <p style="font-size:12px;">Silakan unduh untuk melihat isinya.</p>
+            <p>Preview tidak tersedia untuk Word</p>
+            <span>Silakan unduh untuk melihat isinya</span>
           </div>
         {% elif arsip.file_type == 'xlsx' %}
           <div class="preview-placeholder">
             <i data-lucide="sheet"></i>
-            <p>Preview tidak tersedia untuk file Excel.</p>
-            <p style="font-size:12px;">Silakan unduh untuk melihat isinya.</p>
+            <p>Preview tidak tersedia untuk Excel</p>
+            <span>Silakan unduh untuk melihat isinya</span>
           </div>
         {% else %}
           <div class="preview-placeholder">
             <i data-lucide="file"></i>
-            <p>Preview tidak tersedia.</p>
+            <p>Preview tidak tersedia</p>
           </div>
         {% endif %}
       </div>
+
       <div class="preview-meta">
-        {{ arsip.file.name|cut:"arsip/"|truncatechars:50 }}
+        <i data-lucide="file"></i>
+        <span>{{ arsip.file.name|cut:"arsip/"|truncatechars:50 }}</span>
       </div>
     </aside>
 
-    {# ============ METADATA (KANAN) ============ #}
-    <main>
+    {# MAIN #}
+    <main class="detail-main">
 
       {# Header #}
-      <h1 class="detail-title">{{ arsip.name }}</h1>
-      {% if arsip.reference_code %}
-        <div class="detail-code">{{ arsip.reference_code }}</div>
-      {% endif %}
+      <div class="detail-head">
+        <h1 class="detail-title">{{ arsip.name }}</h1>
+        {% if arsip.reference_code %}
+          <div class="detail-code">
+            <i data-lucide="hash"></i>
+            <span>{{ arsip.reference_code }}</span>
+          </div>
+        {% endif %}
+      </div>
 
       {# Action Bar #}
-      <div class="action-bar">
-        <a href="{{ arsip.file.url }}" download class="btn btn-primary">
+      <div class="detail-actions">
+        <a href="{{ arsip.file.url }}" download class="btn-v2 btn-v2-primary">
           <i data-lucide="download"></i>
           <span>Unduh</span>
         </a>
-        <a href="{% url 'arsip:arsip_edit' arsip.pk %}" class="btn btn-secondary">
-          <i data-lucide="pencil"></i>
-          <span>Edit</span>
-        </a>
-        <a href="{% url 'arsip:delete' arsip.pk %}" class="btn btn-secondary" style="color:#DC2626;">
-          <i data-lucide="trash-2"></i>
-          <span>Hapus</span>
-        </a>
+        {% if user.is_authenticated and user.is_staff %}
+          <a href="{% url 'arsip:arsip_edit' arsip.pk %}" class="btn-v2 btn-v2-secondary">
+            <i data-lucide="pencil"></i>
+            <span>Edit</span>
+          </a>
+          <a href="{% url 'arsip:delete' arsip.pk %}" class="btn-v2 btn-v2-secondary btn-v2-danger-text">
+            <i data-lucide="trash-2"></i>
+            <span>Hapus</span>
+          </a>
+        {% endif %}
       </div>
 
-      {# 1. AREA IDENTITAS #}
+      {# AREA 1 #}
       <div class="meta-area">
-        <div class="meta-header open" onclick="toggleMeta(this)">
-          <div class="meta-header-title">
+        <button type="button" class="meta-header open" onclick="toggleMeta(this)">
+          <div class="meta-header-left">
             <i data-lucide="id-card"></i>
             <span>Area Identitas</span>
           </div>
-          <i data-lucide="chevron-down"></i>
-        </div>
+          <i data-lucide="chevron-down" class="meta-chevron"></i>
+        </button>
         <div class="meta-body">
           <div class="meta-row">
-            <div class="meta-label">Kode Referensi</div>
-            <div class="meta-value {% if not arsip.reference_code %}empty{% endif %}">{{ arsip.reference_code|default:"-" }}</div>
+            <span class="meta-label">Kode Referensi</span>
+            <span class="meta-value {% if not arsip.reference_code %}empty{% endif %}">{{ arsip.reference_code|default:"-" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Judul</div>
-            <div class="meta-value">{{ arsip.name }}</div>
+            <span class="meta-label">Judul</span>
+            <span class="meta-value">{{ arsip.name }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Tanggal</div>
-            <div class="meta-value {% if not arsip.date_created %}empty{% endif %}">{{ arsip.date_created|date:"d F Y"|default:"-" }}</div>
+            <span class="meta-label">Tanggal</span>
+            <span class="meta-value {% if not arsip.date_created %}empty{% endif %}">{{ arsip.date_created|date:"d F Y"|default:"-" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Level Deskripsi</div>
-            <div class="meta-value {% if not arsip.level_description %}empty{% endif %}">{{ arsip.level_description|default:"-" }}</div>
+            <span class="meta-label">Level Deskripsi</span>
+            <span class="meta-value">{{ arsip.level_description|default:"item" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Ukuran & Media</div>
-            <div class="meta-value {% if not arsip.extent_medium %}empty{% endif %}">{{ arsip.extent_medium|default:"-" }}</div>
+            <span class="meta-label">Ukuran & Media</span>
+            <span class="meta-value {% if not arsip.extent_medium %}empty{% endif %}">{{ arsip.extent_medium|default:"-" }}</span>
           </div>
         </div>
       </div>
 
-      {# 2. AREA KONTEKS #}
+      {# AREA 2 #}
       <div class="meta-area">
-        <div class="meta-header open" onclick="toggleMeta(this)">
-          <div class="meta-header-title">
+        <button type="button" class="meta-header open" onclick="toggleMeta(this)">
+          <div class="meta-header-left">
             <i data-lucide="building-2"></i>
             <span>Area Konteks</span>
           </div>
-          <i data-lucide="chevron-down"></i>
-        </div>
+          <i data-lucide="chevron-down" class="meta-chevron"></i>
+        </button>
         <div class="meta-body">
           <div class="meta-row">
-            <div class="meta-label">Nama Pencipta</div>
-            <div class="meta-value {% if not arsip.creator %}empty{% endif %}">{{ arsip.creator|default:"-" }}</div>
+            <span class="meta-label">Nama Pencipta</span>
+            <span class="meta-value {% if not arsip.creator %}empty{% endif %}">{{ arsip.creator|default:"-" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Repositori</div>
-            <div class="meta-value {% if not arsip.repository %}empty{% endif %}">{{ arsip.repository|default:"-" }}</div>
+            <span class="meta-label">Repositori</span>
+            <span class="meta-value {% if not arsip.repository %}empty{% endif %}">{{ arsip.repository|default:"-" }}</span>
           </div>
         </div>
       </div>
 
-      {# 3. AREA ISI & STRUKTUR #}
+      {# AREA 3 #}
       <div class="meta-area">
-        <div class="meta-header open" onclick="toggleMeta(this)">
-          <div class="meta-header-title">
+        <button type="button" class="meta-header open" onclick="toggleMeta(this)">
+          <div class="meta-header-left">
             <i data-lucide="file-text"></i>
             <span>Area Isi & Struktur</span>
           </div>
-          <i data-lucide="chevron-down"></i>
-        </div>
+          <i data-lucide="chevron-down" class="meta-chevron"></i>
+        </button>
         <div class="meta-body">
           <div class="meta-row">
-            <div class="meta-label">Keterangan</div>
-            <div class="meta-value {% if not arsip.description %}empty{% endif %}">{{ arsip.description|default:"-" }}</div>
+            <span class="meta-label">Keterangan</span>
+            <span class="meta-value {% if not arsip.description %}empty{% endif %}">{{ arsip.description|default:"-" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Cakupan & Isi</div>
-            <div class="meta-value {% if not arsip.scope_content %}empty{% endif %}">{{ arsip.scope_content|default:"-" }}</div>
+            <span class="meta-label">Cakupan & Isi</span>
+            <span class="meta-value {% if not arsip.scope_content %}empty{% endif %}">{{ arsip.scope_content|default:"-" }}</span>
           </div>
         </div>
       </div>
 
-      {# 4. AREA CATATAN #}
+      {# AREA 4 #}
       <div class="meta-area">
-        <div class="meta-header open" onclick="toggleMeta(this)">
-          <div class="meta-header-title">
+        <button type="button" class="meta-header open" onclick="toggleMeta(this)">
+          <div class="meta-header-left">
             <i data-lucide="sticky-note"></i>
             <span>Area Catatan</span>
           </div>
-          <i data-lucide="chevron-down"></i>
-        </div>
+          <i data-lucide="chevron-down" class="meta-chevron"></i>
+        </button>
         <div class="meta-body">
           <div class="meta-row">
-            <div class="meta-label">Catatan</div>
-            <div class="meta-value {% if not arsip.note %}empty{% endif %}">{{ arsip.note|default:"-" }}</div>
+            <span class="meta-label">Catatan</span>
+            <span class="meta-value {% if not arsip.note %}empty{% endif %}">{{ arsip.note|default:"-" }}</span>
           </div>
         </div>
       </div>
 
-      {# 5. TITIK TEMU #}
+      {# AREA 5 #}
       <div class="meta-area">
-        <div class="meta-header open" onclick="toggleMeta(this)">
-          <div class="meta-header-title">
+        <button type="button" class="meta-header open" onclick="toggleMeta(this)">
+          <div class="meta-header-left">
             <i data-lucide="key-round"></i>
             <span>Titik Temu</span>
           </div>
-          <i data-lucide="chevron-down"></i>
-        </div>
+          <i data-lucide="chevron-down" class="meta-chevron"></i>
+        </button>
         <div class="meta-body">
           <div class="meta-row">
-            <div class="meta-label">Akses Poin Subjek</div>
-            <div class="meta-value {% if not arsip.subject_access %}empty{% endif %}">{{ arsip.subject_access|default:"-" }}</div>
+            <span class="meta-label">Akses Poin Subjek</span>
+            <span class="meta-value {% if not arsip.subject_access %}empty{% endif %}">{{ arsip.subject_access|default:"-" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Lokasi Fisik</div>
-            <div class="meta-value {% if not arsip.location_physical %}empty{% endif %}">{{ arsip.location_physical|default:"-" }}</div>
+            <span class="meta-label">Lokasi Fisik</span>
+            <span class="meta-value {% if not arsip.location_physical %}empty{% endif %}">{{ arsip.location_physical|default:"-" }}</span>
           </div>
         </div>
       </div>
 
-      {# 6. METADATA OBJEK DIGITAL #}
+      {# AREA 6 #}
       <div class="meta-area">
-        <div class="meta-header open" onclick="toggleMeta(this)">
-          <div class="meta-header-title">
+        <button type="button" class="meta-header open" onclick="toggleMeta(this)">
+          <div class="meta-header-left">
             <i data-lucide="hard-drive"></i>
             <span>Metadata Objek Digital</span>
           </div>
-          <i data-lucide="chevron-down"></i>
-        </div>
+          <i data-lucide="chevron-down" class="meta-chevron"></i>
+        </button>
         <div class="meta-body">
           <div class="meta-row">
-            <div class="meta-label">Level Akses</div>
-            <div class="meta-value {% if not arsip.access_level %}empty{% endif %}">{{ arsip.access_level|default:"-" }}</div>
+            <span class="meta-label">Level Akses</span>
+            <span class="meta-value">{{ arsip.access_level|default:"Terbatas" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Nama Berkas</div>
-            <div class="meta-value">{{ arsip.file.name|cut:"arsip/"|default:"-" }}</div>
+            <span class="meta-label">Nama Berkas</span>
+            <span class="meta-value">{{ arsip.file.name|cut:"arsip/"|default:"-" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Jenis Media</div>
-            <div class="meta-value {% if not arsip.media_type %}empty{% endif %}">{{ arsip.media_type|default:"-" }}</div>
+            <span class="meta-label">Jenis Media</span>
+            <span class="meta-value {% if not arsip.media_type %}empty{% endif %}">{{ arsip.media_type|default:"-" }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Tipe File</div>
-            <div class="meta-value">{{ arsip.get_file_type_display }}</div>
+            <span class="meta-label">Tipe File</span>
+            <span class="meta-value">{{ arsip.get_file_type_display }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Ukuran</div>
-            <div class="meta-value">{{ arsip.size_bytes|filesizeformat }}</div>
+            <span class="meta-label">Ukuran</span>
+            <span class="meta-value">{{ arsip.size_bytes|filesizeformat }}</span>
           </div>
           <div class="meta-row">
-            <div class="meta-label">Terupload</div>
-            <div class="meta-value">{{ arsip.uploaded_at|date:"d F Y, H:i" }} WIB</div>
+            <span class="meta-label">Terupload</span>
+            <span class="meta-value">{{ arsip.uploaded_at|date:"d F Y, H:i" }} WIB</span>
           </div>
         </div>
       </div>
@@ -240,18 +249,14 @@
 </div>
 
 <script>
-  function toggleMeta(el) {
-    el.classList.toggle('open');
-    const body = el.nextElementSibling;
-    if (body) {
-      body.classList.toggle('hidden');
-    }
+  function toggleMeta(btn) {
+    btn.classList.toggle('open');
+    const body = btn.nextElementSibling;
+    if (body) body.classList.toggle('hidden');
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
-    }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   });
 </script>
 {% endblock %}

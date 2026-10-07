@@ -1,30 +1,30 @@
 <ul class="tree-list">
   {% for node in nodes %}
     <li class="tree-item">
-      <div class="tree-row {% if node.folder.pk == current_folder_id %}is-active{% endif %}">
-
-        {% if node.children %}
-          <button type="button" class="tree-toggle" data-target="node-{{ node.folder.pk }}">
-            <i data-lucide="chevron-right"></i>
-          </button>
-        {% else %}
-          <span class="tree-toggle empty"></span>
-        {% endif %}
-
-        <a href="{% url 'arsip:folder' node.folder.pk %}" class="tree-link">
-          {% if node.children %}
-            <i data-lucide="folder-open"></i>
-          {% else %}
-            <i data-lucide="folder"></i>
-          {% endif %}
-          <span class="tree-label">{{ node.folder.name }}</span>
-        </a>
-
-      </div>
-
       {% if node.children %}
-        <div class="tree-children" id="node-{{ node.folder.pk }}" style="display:none;">
-          {% include 'components/tree_node.html' with nodes=node.children current_folder_id=current_folder_id %}
+        <details class="tree-details" {% if node.folder.pk in ancestor_ids %}open{% endif %}>
+          <summary class="tree-summary">
+            <span class="tree-arrow">
+              <i data-lucide="chevron-right"></i>
+            </span>
+            <a href="{% url 'arsip:folder' node.folder.pk %}"
+               class="tree-link"
+               onclick="event.stopPropagation();">
+              <i data-lucide="folder-open"></i>
+              <span class="tree-label">{{ node.folder.name }}</span>
+            </a>
+          </summary>
+          <div class="tree-children">
+            {% include 'components/tree_node.html' with nodes=node.children ancestor_ids=ancestor_ids current_folder_id=current_folder_id %}
+          </div>
+        </details>
+      {% else %}
+        <div class="tree-row-leaf {% if node.folder.pk == current_folder_id %}is-active{% endif %}">
+          <span class="tree-arrow-spacer"></span>
+          <a href="{% url 'arsip:folder' node.folder.pk %}" class="tree-link">
+            <i data-lucide="folder"></i>
+            <span class="tree-label">{{ node.folder.name }}</span>
+          </a>
         </div>
       {% endif %}
     </li>

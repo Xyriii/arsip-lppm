@@ -2,23 +2,30 @@
 {% block title %}500 — Kesalahan Server{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="error-page">
-    <div class="error-code">500</div>
-    <h1 class="error-title">Terjadi Kesalahan</h1>
-    <p class="error-desc">
+<div class="error-page-v2">
+  <div class="error-content-v2 reveal">
+    <div class="error-code-v2">500</div>
+    <h1 class="error-title-v2">Terjadi Kesalahan</h1>
+    <p class="error-desc-v2">
       Server sedang bermasalah. Tim kami sudah diberitahu. Coba lagi beberapa saat.
     </p>
-    <div class="error-actions">
-      <a href="{% url 'home' %}" class="btn btn-primary">
+    <div class="error-actions-v2">
+      <a href="{% url 'home' %}" class="btn-v2 btn-v2-primary">
         <i data-lucide="home"></i>
         <span>Kembali ke Beranda</span>
       </a>
-      <button onclick="location.reload()" class="btn btn-secondary">
+      <button type="button" class="btn-v2 btn-v2-secondary" onclick="location.reload()">
         <i data-lucide="refresh-cw"></i>
         <span>Muat Ulang</span>
       </button>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof initScrollReveal === 'function') initScrollReveal();
+  });
+</script>
 {% endblock %}

@@ -1,21 +1,109 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Hapus Arsip — Arsip LPPM UNS{% endblock %}
 
-{% block content %}
-<div class="glass-card detail-card" style="max-width: 480px; margin: 48px auto;">
-  <h1>Hapus Arsip?</h1>
-  <p style="margin-bottom: 24px;">
-    Yakin mau hapus <strong>{{ arsip.name }}</strong>?
-    Tindakan ini gak bisa dibatalkan.
-  </p>
+{% block extra_css %}
+<style>
+  .delete-page {
+    min-height: calc(100vh - 56px - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8) var(--space-4);
+  }
+  .delete-card {
+    width: 100%;
+    max-width: 480px;
+    padding: var(--space-6);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: fade-up 500ms var(--motion-spring);
+  }
+  .delete-icon {
+    width: 56px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--danger-bg);
+    color: var(--danger-text);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-4);
+  }
+  .delete-icon [data-lucide] {
+    width: 24px;
+    height: 24px;
+    stroke-width: 1.75;
+  }
+  .delete-title {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin: 0 0 var(--space-3);
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+  .delete-desc {
+    font-size: var(--text-base);
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-6);
+    line-height: 1.5;
+  }
+  .delete-desc strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    word-break: break-word;
+  }
+  .delete-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .delete-actions .btn-v2 {
+    min-width: 120px;
+    height: 44px;
+    font-size: var(--text-base);
+  }
+</style>
+{% endblock %}
 
-  <form method="post" style="display: flex; gap: 12px;">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-primary" style="background: #DC2626;">
-      Ya, Hapus
-    </button>
-    <a href="{% url 'arsip:list' %}" class="btn-ghost">Batal</a>
-  </form>
+{% block content %}
+<div class="delete-page">
+  <div class="delete-card">
+
+    <div class="delete-icon">
+      <i data-lucide="alert-triangle"></i>
+    </div>
+
+    <h1 class="delete-title">Hapus Arsip?</h1>
+    <p class="delete-desc">
+      Yakin mau hapus <strong>{{ arsip.name }}</strong>?
+      Tindakan ini gak bisa dibatalkan.
+    </p>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="delete-actions">
+        <a href="{% url 'arsip:detail' arsip.pk %}" class="btn-v2 btn-v2-secondary">
+          <i data-lucide="x"></i>
+          <span>Batal</span>
+        </a>
+        <button type="submit" class="btn-v2 btn-v2-danger">
+          <i data-lucide="trash-2"></i>
+          <span>Ya, Hapus</span>
+        </button>
+      </div>
+    </form>
+
+  </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
 {% endblock %}

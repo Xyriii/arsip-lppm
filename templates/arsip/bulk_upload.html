@@ -1,74 +1,76 @@
 {% extends 'base.html' %}
-{% block title %}Upload Banyak File — Arsip LPPM UNS{% endblock %}
+{% block title %}Bulk Upload — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="upload-wrap">
+<div class="form-page-v2">
 
-    <a href="{% url 'arsip:list' %}" class="btn-back">
-      <i data-lucide="arrow-left"></i>
-      <span>Kembali</span>
-    </a>
+  <a href="{% url 'arsip:list' %}" class="btn-back-v2">
+    <i data-lucide="arrow-left"></i>
+    <span>Kembali</span>
+  </a>
 
-    <div class="upload-header">
+  <div class="form-header-v2 reveal">
+    <div class="form-header-icon-v2">
       <i data-lucide="upload-cloud"></i>
-      <h1>Upload Banyak File</h1>
-      <p>Pilih folder tujuan, terus pilih banyak file sekaligus.</p>
     </div>
+    <h1>Bulk Upload</h1>
+    <p>Upload banyak file sekaligus ke folder yang sama.</p>
+  </div>
 
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
-          <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
-          <span>{{ message }}</span>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert-v2 alert-{{ message.tags }}">
+        <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
+        <span>{{ message }}</span>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="info-box-v2 reveal">
+    <i data-lucide="lightbulb"></i>
+    <div>
+      <strong>Cara pakai:</strong>
+      Pilih folder tujuan, lalu tahan <kbd>Ctrl</kbd> (Windows) atau <kbd>Cmd</kbd> (Mac) untuk memilih banyak file sekaligus.
+      Semua file akan masuk ke folder yang sama.
+    </div>
+  </div>
+
+  <div class="form-card-v2 reveal">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="form-field-v2">
+          <label for="{{ field.id_for_label }}" class="form-label-v2">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small class="form-help-v2">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <small class="form-error-v2">{{ field.errors.0 }}</small>
+          {% endif %}
         </div>
       {% endfor %}
-    {% endif %}
 
-    <div class="info-box">
-      <i data-lucide="info"></i>
-      <div>
-        <strong>Cara pakai:</strong> Pilih folder tujuan, terus tahan <code>Ctrl</code> (Windows) atau <code>Cmd</code> (Mac) buat milih banyak file sekaligus.
-        Semua file akan masuk ke folder yang lo pilih.
+      <div class="form-actions-v2">
+        <a href="{% url 'arsip:list' %}" class="btn-v2 btn-v2-secondary">
+          <i data-lucide="x"></i>
+          <span>Batal</span>
+        </a>
+        <button type="submit" class="btn-v2 btn-v2-primary">
+          <i data-lucide="upload-cloud"></i>
+          <span>Upload Semua</span>
+        </button>
       </div>
-    </div>
-
-    <div class="glass-card">
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        {% for field in form %}
-          <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}
-              <small class="form-help">{{ field.help_text }}</small>
-            {% endif %}
-            {% if field.errors %}
-              <small class="field-error">{{ field.errors.0 }}</small>
-            {% endif %}
-          </div>
-        {% endfor %}
-
-        <div class="form-actions">
-          <a href="{% url 'arsip:list' %}" class="btn btn-secondary">
-            <i data-lucide="x"></i>
-            <span>Batal</span>
-          </a>
-          <button type="submit" class="btn btn-primary">
-            <i data-lucide="upload-cloud"></i>
-            <span>Upload Semua</span>
-          </button>
-        </div>
-      </form>
-    </div>
-
+    </form>
   </div>
+
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof initScrollReveal === 'function') initScrollReveal();
   });
 </script>
 {% endblock %}

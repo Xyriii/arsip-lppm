@@ -1,86 +1,94 @@
 {% load static %}
-<nav class="navbar">
-  <div class="navbar-container">
+<nav class="nav-lin" id="mainNav">
+  <div class="nav-lin-inner">
 
-    <a href="{% url 'arsip:list' %}" class="navbar-brand">
-      <img src="{% static 'img/logo-uns.svg' %}" alt="Arsip LPPM UNS">
-      <span class="navbar-brand-tooltip">Arsip LPPM UNS</span>
-    </a>
+    {# KIRI: Logo + Menu Utama #}
+    <div class="nav-lin-left">
+      <a href="{% url 'home' %}" class="nav-lin-brand">
+        <img src="{% static 'img/logo-uns.svg' %}" alt="Arsip LPPM UNS">
+        <span class="nav-lin-brand-text">Arsip LPPM UNS</span>
+      </a>
 
-    <div class="navbar-menu">
+      <div class="nav-lin-menu">
+        <a href="{% url 'arsip:list' %}" class="nav-lin-link">
+          Daftar Arsip
+        </a>
+        <a href="{% url 'arsip:browse' %}" class="nav-lin-link">
+          Jelajah
+        </a>
 
-  {# Daftar Arsip — public #}
-  <a href="{% url 'arsip:list' %}" class="nav-icon-btn" title="Daftar Arsip">
-    <i data-lucide="list"></i>
-    <span class="nav-tooltip">Daftar Arsip</span>
-  </a>
+        {% if user.is_authenticated and user.is_staff %}
+          <a href="{% url 'arsip:upload' %}" class="nav-lin-link">
+            Unggah
+          </a>
+          <a href="{% url 'arsip:bulk_upload' %}" class="nav-lin-link">
+            Bulk Upload
+          </a>
+          <a href="{% url 'arsip:folder_upload' %}" class="nav-lin-link">
+            Folder ZIP
+          </a>
+          <a href="{% url 'arsip:user_list' %}" class="nav-lin-link">
+            Pengguna
+          </a>
+          <a href="{% url 'arsip:activity_log' %}" class="nav-lin-link">
+            Aktivitas
+          </a>
+        {% endif %}
+      </div>
+    </div>
 
-  {# Jelajah — public #}
-  <a href="{% url 'arsip:browse' %}" class="nav-icon-btn" title="Jelajah Hierarki">
-    <i data-lucide="folder-tree"></i>
-    <span class="nav-tooltip">Jelajah Hierarki</span>
-  </a>
+    {# KANAN: Search + Actions #}
+    <div class="nav-lin-right">
 
-  {# ADMIN ONLY #}
-  {% if user.is_authenticated and user.is_staff %}
-    <a href="{% url 'arsip:upload' %}" class="nav-icon-btn" title="Unggah File">
-      <i data-lucide="upload"></i>
-      <span class="nav-tooltip">Unggah File</span>
-    </a>
-    <a href="{% url 'arsip:bulk_upload' %}" class="nav-icon-btn" title="Bulk Upload">
-      <i data-lucide="upload-cloud"></i>
-      <span class="nav-tooltip">Bulk Upload</span>
-    </a>
-    <a href="{% url 'arsip:folder_upload' %}" class="nav-icon-btn" title="Upload Folder ZIP">
-      <i data-lucide="folder-up"></i>
-      <span class="nav-tooltip">Upload Folder ZIP</span>
-    </a>
-    <a href="{% url 'arsip:user_list' %}" class="nav-icon-btn" title="Kelola Pengguna">
-      <i data-lucide="users"></i>
-      <span class="nav-tooltip">Kelola Pengguna</span>
-    </a>
-  {% endif %}
+      {# Search #}
+      <form method="get" action="{% url 'arsip:list' %}" class="nav-lin-search">
+        <span class="nav-lin-search-icon">
+          <i data-lucide="search"></i>
+        </span>
+        <input type="text" name="q" placeholder="Cari arsip..." class="nav-lin-search-input">
+        <kbd class="nav-lin-search-kbd">/</kbd>
+      </form>
 
-  {# Dark mode #}
-  <button type="button" class="nav-icon-btn" onclick="toggleDarkMode()" title="Mode Gelap/Terang">
-    <i data-lucide="moon" id="themeIcon"></i>
-    <span class="nav-tooltip">Mode Gelap/Terang</span>
-  </button>
-
-  {# LOGIN / LOGOUT (conditional) #}
-  {% if user.is_authenticated %}
-    <form method="post" action="{% url 'logout' %}" style="display:inline;margin:0;">
-      {% csrf_token %}
-      <button type="submit" class="nav-icon-btn nav-icon-danger" title="Keluar">
-        <i data-lucide="log-out"></i>
-        <span class="nav-tooltip">Keluar ({{ user.username }})</span>
+      {# Dark mode — ghost #}
+      <button type="button" class="nav-lin-icon-btn" onclick="toggleDarkMode()" title="Dark mode">
+        <i data-lucide="sun" id="themeIcon"></i>
       </button>
-    </form>
-  {% else %}
-    <a href="{% url 'login' %}" class="nav-icon-btn" title="Masuk">
-      <i data-lucide="log-in"></i>
-      <span class="nav-tooltip">Masuk</span>
-    </a>
-  {% endif %}
 
-  {% if user.is_authenticated and user.is_staff %}
-  <a href="{% url 'arsip:upload' %}" class="nav-icon-btn" title="Unggah File">
-    <i data-lucide="upload"></i>
-    <span class="nav-tooltip">Unggah File</span>
-  </a>
-  <a href="{% url 'arsip:bulk_upload' %}" class="nav-icon-btn" title="Bulk Upload">
-    <i data-lucide="upload-cloud"></i>
-    <span class="nav-tooltip">Bulk Upload</span>
-  </a>
-  <a href="{% url 'arsip:folder_upload' %}" class="nav-icon-btn" title="Upload Folder ZIP">
-    <i data-lucide="folder-up"></i>
-    <span class="nav-tooltip">Upload Folder ZIP</span>
-  </a>
-  <a href="{% url 'arsip:user_list' %}" class="nav-icon-btn" title="Kelola Pengguna">
-    <i data-lucide="users"></i>
-    <span class="nav-tooltip">Kelola Pengguna</span>
-  </a>
-{% endif %}
-</div>
+      {# Auth #}
+      {% if user.is_authenticated %}
+        <div class="nav-lin-user">
+          <div class="nav-lin-avatar">
+            <i data-lucide="user"></i>
+          </div>
+          <div class="nav-lin-user-menu">
+            <div class="nav-lin-user-info">
+              <div class="nav-lin-user-name">{{ user.username }}</div>
+              <div class="nav-lin-user-role">
+                {% if user.is_superuser %}Owner{% elif user.is_staff %}Admin{% else %}User{% endif %}
+              </div>
+            </div>
+            <div class="nav-lin-user-divider"></div>
+            {% if user.is_staff %}
+              <a href="/admin/" target="_blank" class="nav-lin-user-item">
+                <i data-lucide="settings"></i>
+                <span>Admin Panel</span>
+              </a>
+            {% endif %}
+            <form method="post" action="{% url 'logout' %}" style="display:contents;">
+              {% csrf_token %}
+              <button type="submit" class="nav-lin-user-item nav-lin-user-item-danger">
+                <i data-lucide="log-out"></i>
+                <span>Keluar</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-lin-cta">
+          Masuk
+        </a>
+      {% endif %}
+
+    </div>
   </div>
 </nav>

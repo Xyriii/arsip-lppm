@@ -3210,3 +3210,79 @@ input[type="file"].input {
   justify-content: center;
   flex-wrap: wrap;
 }
+/* ============================================================
+   ACTIVITY LOG
+   ============================================================ */
+.log-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+  transition: background 150ms;
+}
+.log-item:last-child {
+  border-bottom: none;
+}
+.log-item:hover {
+  background: rgba(0, 88, 168, 0.04);
+}
+
+.log-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.log-icon [data-lucide] {
+  width: 18px;
+  height: 18px;
+}
+.log-icon-login { background: rgba(30,158,90,0.1); color: #1E9E5A; }
+.log-icon-logout { background: rgba(100,116,139,0.1); color: #64748B; }
+.log-icon-upload { background: rgba(0,88,168,0.1); color: #0058A8; }
+.log-icon-edit { background: rgba(217,119,6,0.1); color: #D97706; }
+.log-icon-delete { background: rgba(220,38,38,0.1); color: #DC2626; }
+.log-icon-create { background: rgba(139,92,246,0.1); color: #7C3AED; }
+.log-icon-move { background: rgba(0,88,168,0.1); color: #0058A8; }
+.log-icon-download { background: rgba(30,158,90,0.1); color: #1E9E5A; }
+
+.log-body {
+  flex: 1;
+  min-width: 0;
+}
+.log-desc {
+  font-size: 14px;
+  color: var(--color-ink);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.log-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-ink-muted);
+}
+.log-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.log-badge {
+  flex-shrink: 0;
+}
+.log-action-login { background: rgba(30,158,90,0.1); color: #1E9E5A; }
+.log-action-logout { background: rgba(100,116,139,0.1); color: #64748B; }
+.log-action-upload { background: rgba(0,88,168,0.1); color: #0058A8; }
+.log-action-edit { background: rgba(217,119,6,0.1); color: #D97706; }
+.log-action-delete { background: rgba(220,38,38,0.1); color: #DC2626; }
+.log-action-create { background: rgba(139,92,246,0.1); color: #7C3AED; }
+.log-action-move { background: rgba(0,88,168,0.1); color: #0058A8; }
+.log-action-download { background: rgba(30,158,90,0.1); color: #1E9E5A; }

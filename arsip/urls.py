@@ -24,4 +24,7 @@ urlpatterns = [
     
     path('public/', views.public_home, name='public_home'),
     path('export/excel/', views.export_excel, name='export_excel'),
+    path('bulk-delete/', views.bulk_delete, name='bulk_delete'),
+    path('bulk-move/', views.bulk_move, name='bulk_move'),
+    path('activity/', views.activity_log, name='activity_log'),
 ]

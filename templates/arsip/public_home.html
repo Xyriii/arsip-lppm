@@ -1,135 +1,287 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard — Arsip LPPM UNS{% endblock %}
+{% block title %}Beranda — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
-<div class="container">
 
-  {# ============ HERO SECTION ============ #}
-  <div class="hero-section">
-    <div class="hero-badge">
-      <i data-lucide="shield-check"></i>
-      <span>Sistem Kearsipan Terpadu</span>
-    </div>
-    <h1 class="hero-title">Cari Arsip, <span class="hero-accent">Kapan Saja</span></h1>
-    <p class="hero-subtitle">
-      Ribuan dokumen LPPM UNS tersimpan rapi, terstruktur, dan siap diakses.
-    </p>
+{# HERO SECTION #}
+<section class="hero-v3">
+  <div class="hero-v3-inner">
 
-    {# Search Gede #}
-    <form method="get" action="{% url 'arsip:list' %}" class="hero-search">
-      <span class="hero-search-icon"><i data-lucide="search"></i></span>
-      <input type="text" name="q" placeholder="Cari nama arsip, kode referensi, atau pencipta...">
-      <button type="submit" class="hero-search-btn">
-        <i data-lucide="arrow-right"></i>
-      </button>
-    </form>
+    <div class="hero-v3-left">
 
-    {# Quick Stats #}
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <div class="hero-stat-num">{{ total_arsip }}</div>
-        <div class="hero-stat-label">Total Arsip</div>
-      </div>
-      <div class="hero-stat-divider"></div>
-      <div class="hero-stat">
-        <div class="hero-stat-num">{{ total_folder }}</div>
-        <div class="hero-stat-label">Folder</div>
-      </div>
-      <div class="hero-stat-divider"></div>
-      <div class="hero-stat">
-        <div class="hero-stat-num">24/7</div>
-        <div class="hero-stat-label">Akses Online</div>
-      </div>
-    </div>
-  </div>
-
-  {# ============ QUICK ACCESS ============ #}
-  <div class="quick-access">
-    <a href="{% url 'arsip:list' %}" class="quick-card">
-      <div class="quick-icon quick-icon-blue">
-        <i data-lucide="list"></i>
-      </div>
-      <div>
-        <div class="quick-title">Daftar Arsip</div>
-        <div class="quick-desc">Lihat semua arsip dalam bentuk tabel</div>
-      </div>
-      <i data-lucide="arrow-right" class="quick-arrow"></i>
-    </a>
-
-    <a href="{% url 'arsip:browse' %}" class="quick-card">
-      <div class="quick-icon quick-icon-green">
-        <i data-lucide="folder-tree"></i>
-      </div>
-      <div>
-        <div class="quick-title">Jelajah Hierarki</div>
-        <div class="quick-desc">Telusuri arsip dari fonds ke item</div>
-      </div>
-      <i data-lucide="arrow-right" class="quick-arrow"></i>
-    </a>
-  </div>
-
-  {# ============ TREE + RECENT ============ #}
-  <div class="browse-wrap" style="margin-top:32px;">
-
-    {# Kiri: Tree #}
-    <aside class="browse-sidebar">
-      <div class="sidebar-title">
-        <i data-lucide="network"></i>
-        <span>Struktur Arsip</span>
-      </div>
-      {% if full_tree %}
-        {% include 'components/tree_node.html' with nodes=full_tree current_folder_id=current_folder_id %}
-      {% else %}
-        <p class="text-muted" style="font-size:13px;text-align:center;padding:16px 0;">
-          Belum ada folder.
-        </p>
-      {% endif %}
-    </aside>
-
-    {# Kanan: Recent Arsip #}
-    <main>
-      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px;">
-        <h2 style="font-size:18px;margin:0;">📄 Arsip Terbaru</h2>
-        <a href="{% url 'arsip:list' %}" style="font-size:13px;color:var(--color-primary);text-decoration:none;font-weight:500;">
-          Lihat Semua →
-        </a>
+      <div class="hero-v3-badge reveal">
+        <span class="hero-v3-badge-dot"></span>
+        <span>Sistem Kearsipan Terpadu</span>
       </div>
 
-      {% if recent_arsip %}
-        <div class="recent-grid">
-          {% for a in recent_arsip %}
-            <a href="{% url 'arsip:detail' a.pk %}" class="recent-card">
-              <div class="recent-icon chip-{{ a.file_type }}">
-                <i data-lucide="file-text"></i>
-              </div>
-              <div class="recent-body">
-                <div class="recent-title">{{ a.name|truncatechars:45 }}</div>
-                <div class="recent-meta">
-                  <span class="chip chip-{{ a.file_type }}">{{ a.get_file_type_display }}</span>
-                  <span>{{ a.size_bytes|filesizeformat }}</span>
-                  <span>·</span>
-                  <span>{{ a.uploaded_at|date:"d M Y" }}</span>
-                </div>
-              </div>
-              <i data-lucide="chevron-right" class="recent-arrow"></i>
-            </a>
-          {% endfor %}
+      <h1 class="hero-v3-title reveal" data-cursor-follow>
+        <span>Cari Arsip,</span><br>
+        <span class="hero-v3-accent">Kapan Saja</span>
+      </h1>
+
+      <p class="hero-v3-sub reveal">
+        Ribuan dokumen LPPM UNS tersimpan rapi, terstruktur, dan siap diakses kapan pun.
+      </p>
+
+      <form method="get" action="{% url 'arsip:list' %}" class="hero-v3-search reveal">
+        <span class="hero-v3-search-icon">
+          <i data-lucide="search"></i>
+        </span>
+        <input type="text" name="q" placeholder="Cari arsip, kode referensi, atau pencipta..." class="hero-v3-search-input">
+        <button type="submit" class="hero-v3-search-btn">
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="hero-v3-stats reveal">
+        <div class="hero-v3-stat">
+          <div class="hero-v3-stat-num" data-count-up="{{ total_arsip }}">0</div>
+          <div class="hero-v3-stat-label">Total Arsip</div>
         </div>
-      {% else %}
-        <div class="glass-card empty-state">
-          <i data-lucide="folder-open"></i>
-          <h3>Belum ada arsip</h3>
-          <p>Arsip akan muncul di sini setelah diunggah admin.</p>
-        </div>
-      {% endif %}
-    </main>
-  </div>
 
+        <div class="hero-v3-stat-divider"></div>
+
+        <div class="hero-v3-stat">
+          <div class="hero-v3-stat-num" data-count-up="{{ total_folder }}">0</div>
+          <div class="hero-v3-stat-label">Folder</div>
+        </div>
+
+        <div class="hero-v3-stat-divider"></div>
+
+        <div class="hero-v3-stat">
+          <div class="hero-v3-stat-num">24/7</div>
+          <div class="hero-v3-stat-label">Akses Online</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="hero-v3-right" aria-hidden="true">
+  <div class="hero-v3-glow"></div>
+
+  {# FLOATING DOCUMENT STACK #}
+  <div class="doc-stack" id="docStack">
+    <div class="doc-card doc-card-3">
+      <div class="doc-header">
+        <span class="doc-dot"></span>
+        <span class="doc-dot"></span>
+        <span class="doc-dot"></span>
+      </div>
+      <div class="doc-icon">
+        <i data-lucide="file-text"></i>
+      </div>
+      <div class="doc-line doc-line-lg"></div>
+      <div class="doc-line doc-line-md"></div>
+      <div class="doc-line doc-line-sm"></div>
+    </div>
+
+    <div class="doc-card doc-card-2">
+      <div class="doc-header">
+        <span class="doc-dot"></span>
+        <span class="doc-dot"></span>
+        <span class="doc-dot"></span>
+      </div>
+      <div class="doc-icon">
+        <i data-lucide="file-text"></i>
+      </div>
+      <div class="doc-line doc-line-lg"></div>
+      <div class="doc-line doc-line-md"></div>
+      <div class="doc-line doc-line-sm"></div>
+    </div>
+
+    <div class="doc-card doc-card-1">
+      <div class="doc-header">
+        <span class="doc-dot"></span>
+        <span class="doc-dot"></span>
+        <span class="doc-dot"></span>
+      </div>
+      <div class="doc-icon">
+        <i data-lucide="file-check"></i>
+      </div>
+      <div class="doc-line doc-line-lg"></div>
+      <div class="doc-line doc-line-md"></div>
+      <div class="doc-line doc-line-sm"></div>
+      <div class="doc-badge">
+        <i data-lucide="check"></i>
+        <span>Terverifikasi</span>
+      </div>
+    </div>
+  </div>
 </div>
+
+  </div>
+</section>
+
+{# QUICK ACCESS #}
+<section class="section-v2">
+  <div class="container">
+    <div class="section-head-v2 reveal">
+      <h2>Akses Cepat</h2>
+      <p>Mulai dari sini</p>
+    </div>
+
+    <div class="quick-grid reveal">
+      <a href="{% url 'arsip:list' %}" class="quick-card-v2">
+        <div class="quick-icon-v2">
+          <i data-lucide="list"></i>
+        </div>
+        <div class="quick-body-v2">
+          <div class="quick-title-v2">Daftar Arsip</div>
+          <div class="quick-desc-v2">Lihat semua arsip dalam bentuk tabel</div>
+        </div>
+        <i data-lucide="arrow-right" class="quick-arrow-v2"></i>
+      </a>
+
+      <a href="{% url 'arsip:browse' %}" class="quick-card-v2">
+        <div class="quick-icon-v2">
+          <i data-lucide="folder-tree"></i>
+        </div>
+        <div class="quick-body-v2">
+          <div class="quick-title-v2">Jelajah Hierarki</div>
+          <div class="quick-desc-v2">Telusuri arsip dari fonds ke item</div>
+        </div>
+        <i data-lucide="arrow-right" class="quick-arrow-v2"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+{# ARSIP TERBARU #}
+{% if recent_arsip %}
+<section class="section-v2 section-alt section-recent-v3">
+  <div class="container">
+
+    <div class="section-head-v3 reveal">
+      <div class="section-head-v3-left">
+        <h2>Arsip Terbaru</h2>
+        <div class="section-head-v3-tag">
+          <span class="section-tag-dot"></span>
+          <span>File yang baru ditambahkan ke sistem</span>
+        </div>
+      </div>
+      <a href="{% url 'arsip:list' %}" class="section-link-v2">
+        Lihat Semua
+        <i data-lucide="arrow-right"></i>
+      </a>
+    </div>
+
+    <div class="recent-scatter-v3">
+      {% for a in recent_arsip %}
+        <a href="{% url 'arsip:detail' a.pk %}" class="recent-card-v3" data-index="{{ forloop.counter0 }}">
+          <div class="recent-top-v3">
+            <div class="recent-icon-v3">
+              <i data-lucide="file-text"></i>
+            </div>
+            <span class="chip chip-{{ a.file_type }}">{{ a.get_file_type_display }}</span>
+          </div>
+          <div class="recent-title-v3">{{ a.name|truncatechars:50 }}</div>
+          <div class="recent-meta-v3">
+            <span>{{ a.size_bytes|filesizeformat }}</span>
+            <span>·</span>
+            <span>{{ a.uploaded_at|date:"d M Y" }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endif %}
+
+{# CARA PENGGUNAAN #}
+<section class="section-v2">
+  <div class="container">
+    <div class="section-head-v2 reveal">
+      <h2>Cara Menggunakan</h2>
+      <p>Hanya 3 langkah sederhana</p>
+    </div>
+
+    <div class="steps-grid-v2">
+      <div class="step-card-v2 reveal">
+        <div class="step-num-v2">01</div>
+        <div class="step-icon-v2">
+          <i data-lucide="search"></i>
+        </div>
+        <div class="step-title-v2">Cari</div>
+        <div class="step-desc-v2">
+          Ketik kata kunci di kolom pencarian, atau telusuri arsip lewat hierarki folder.
+        </div>
+      </div>
+
+      <div class="step-card-v2 reveal">
+        <div class="step-num-v2">02</div>
+        <div class="step-icon-v2">
+          <i data-lucide="eye"></i>
+        </div>
+        <div class="step-title-v2">Lihat Detail</div>
+        <div class="step-desc-v2">
+          Buka file untuk melihat metadata lengkap, preview dokumen, dan informasi terkait.
+        </div>
+      </div>
+
+      <div class="step-card-v2 reveal">
+        <div class="step-num-v2">03</div>
+        <div class="step-icon-v2">
+          <i data-lucide="download"></i>
+        </div>
+        <div class="step-title-v2">Unduh</div>
+        <div class="step-desc-v2">
+          Klik tombol unduh untuk menyimpan file ke perangkat Anda. Gratis dan tanpa batas.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# LINK TERKAIT #}
+<section class="section-v2 section-alt">
+  <div class="container">
+    <div class="section-head-v2 reveal">
+      <h2>Link Terkait</h2>
+      <p>Sumber informasi lainnya</p>
+    </div>
+
+    <div class="links-grid-v2 reveal">
+      <a href="#" class="link-card-v2">
+        <div class="link-icon-v2">
+          <i data-lucide="globe"></i>
+        </div>
+        <div class="link-title-v2">Website UNS</div>
+        <div class="link-desc-v2">uns.ac.id</div>
+      </a>
+
+      <a href="#" class="link-card-v2">
+        <div class="link-icon-v2">
+          <i data-lucide="building-2"></i>
+        </div>
+        <div class="link-title-v2">LPPM UNS</div>
+        <div class="link-desc-v2">Lembaga Penelitian & Pengabdian</div>
+      </a>
+
+      <a href="#" class="link-card-v2">
+        <div class="link-icon-v2">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="link-title-v2">Portal Akademik</div>
+        <div class="link-desc-v2">SIAKAD UNS</div>
+      </a>
+
+      <a href="#" class="link-card-v2">
+        <div class="link-icon-v2">
+          <i data-lucide="mail"></i>
+        </div>
+        <div class="link-title-v2">Kontak</div>
+        <div class="link-desc-v2">Hubungi kami</div>
+      </a>
+    </div>
+  </div>
+</section>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof initScrollReveal === 'function') initScrollReveal();
   });
 </script>
+
 {% endblock %}

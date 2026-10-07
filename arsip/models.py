@@ -170,3 +170,37 @@ class Arsip(models.Model):
 
     def size_mb(self):
         return round(self.size_bytes / (1024 * 1024), 2)
+
+class ActivityLog(models.Model):
+    """Log aktivitas user"""
+    ACTION_CHOICES = [
+        ('login', 'Login'),
+        ('logout', 'Logout'),
+        ('upload', 'Upload'),
+        ('edit', 'Edit'),
+        ('delete', 'Delete'),
+        ('create', 'Create'),
+        ('move', 'Move'),
+        ('download', 'Download'),
+    ]
+    
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='activities'
+    )
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES, db_index=True)
+    description = models.TextField()
+    target_type = models.CharField(max_length=50, blank=True)
+    target_id = models.IntegerField(null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Activity Log'
+        verbose_name_plural = 'Activity Logs'
+    
+    def __str__(self):
+        return f"{self.user} - {self.action} - {self.created_at}"

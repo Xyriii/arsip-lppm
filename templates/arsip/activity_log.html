@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Log Aktivitas — Arsip LPPM UNS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/page-activity.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="activity-page">
+
+  {# BREADCRUMB #}
+  <nav class="activity-crumb">
+    <a href="{% url 'arsip:list' %}">
+      <i data-lucide="home"></i>
+      <span>Dashboard</span>
+    </a>
+    <span class="activity-crumb-sep"><i data-lucide="chevron-right"></i></span>
+    <span class="activity-crumb-current">Log Aktivitas</span>
+  </nav>
+
+  {# HEADER #}
+  <div class="activity-head">
+    <h1 class="activity-title">Log Aktivitas</h1>
+    <p class="activity-subtitle">Rekam jejak semua aktivitas di sistem</p>
+  </div>
+
+  {# FILTER #}
+  <div class="activity-filter">
+    <form method="get">
+      <select name="action" class="input" onchange="this.form.submit()" style="flex:1;min-width:180px;">
+        <option value="">Semua Aksi</option>
+        {% for value, label in action_choices %}
+          <option value="{{ value }}" {% if action_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <select name="user" class="input" onchange="this.form.submit()" style="flex:1;min-width:180px;">
+        <option value="">Semua User</option>
+        {% for u in users %}
+          <option value="{{ u.username }}" {% if user_filter == u.username %}selected{% endif %}>
+            {{ u.username }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <a href="{% url 'arsip:activity_log' %}" class="btn-v2 btn-v2-secondary">
+        <i data-lucide="rotate-ccw"></i>
+        <span>Reset</span>
+      </a>
+    </form>
+  </div>
+
+  {# LOG LIST #}
+  {% if log_list %}
+    <div class="activity-list">
+      {% for log in log_list %}
+        <div class="log-item">
+          <div class="log-icon log-icon-{{ log.action }}">
+            <i data-lucide="{% if log.action == 'login' %}log-in{% elif log.action == 'logout' %}log-out{% elif log.action == 'upload' %}upload{% elif log.action == 'edit' %}pencil{% elif log.action == 'delete' %}trash-2{% elif log.action == 'create' %}plus{% elif log.action == 'move' %}folder-input{% elif log.action == 'download' %}download{% else %}activity{% endif %}"></i>
+          </div>
+
+          <div class="log-body">
+            <div class="log-desc">{{ log.description }}</div>
+            <div class="log-meta">
+              <span class="log-user">
+                <i data-lucide="user"></i>
+                <span>{{ log.user.username|default:"System" }}</span>
+              </span>
+              <span class="log-meta-sep">·</span>
+              <span>{{ log.created_at|date:"d M Y, H:i" }}</span>
+              {% if log.ip_address %}
+                <span class="log-meta-sep">·</span>
+                <span>{{ log.ip_address }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="log-badge">
+            <span class="log-chip log-chip-{{ log.action }}">{{ log.get_action_display }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% include 'components/pagination.html' %}
+  {% else %}
+    <div class="activity-empty">
+      <i data-lucide="activity"></i>
+      <h3>Belum ada aktivitas</h3>
+      <p>Aktivitas user akan muncul di sini.</p>
+    </div>
+  {% endif %}
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+</script>
+{% endblock %}

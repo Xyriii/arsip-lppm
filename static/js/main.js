@@ -1,289 +1,454 @@
-
-/* ============================================================
-   Website Arsip LPPM UNS — main.js
-   ============================================================ */
 // ============================================
 // LUCIDE ICONS
 // ============================================
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
 });
-/* ===========================================================
-   DARK MODE
-   ============================================================ */
-function toggleTheme() {
-  const root = document.documentElement;
-  const isDark = root.classList.toggle('dark');
-  try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
-  updateThemeIcon();
-}
 
-function updateThemeIcon() {
-  const isDark = document.documentElement.classList.contains('dark');
-  document.querySelectorAll('.icon-moon').forEach(el => el.classList.toggle('hidden', isDark));
-  document.querySelectorAll('.icon-sun').forEach(el => el.classList.toggle('hidden', !isDark));
-}
-
-/* ============================================================
-   MOBILE MENU (navbar)
-   ============================================================ */
-function toggleMenu(btn) {
-  const menu = document.getElementById('navbar-menu');
-  if (!menu) return;
-  const isOpen = menu.classList.toggle('is-open');
-  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-}
-
-/* ============================================================
-   TOAST NOTIFICATION
-   ============================================================ */
-const TOAST_ICONS = {
-  success: 'check-circle-2',
-  warning: 'alert-circle',
-  danger:  'x-circle',
-  info:    'info',
-};
-
-function showToast(message, type = 'info', duration = 4000) {
-  let container = document.getElementById('toast-container');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toast-container';
-    container.className = 'toast-container';
-    container.setAttribute('aria-live', 'polite');
-    container.setAttribute('aria-atomic', 'true');
-    document.body.appendChild(container);
+// ============================================
+// DARK MODE TOGGLE
+// ============================================
+function toggleDarkMode() {
+  const html = document.documentElement;
+  const isDark = html.classList.toggle('dark');
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  
+  // Update icon
+  const icon = document.getElementById('themeIcon');
+  if (icon) {
+    icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
   }
-
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.setAttribute('role', 'status');
-
-  const iconName = TOAST_ICONS[type] || TOAST_ICONS.info;
-
-  toast.innerHTML = `
-    <span class="toast-icon">
-      <i data-lucide="${iconName}" style="width:18px;height:18px;"></i>
-    </span>
-    <div class="toast-body"></div>
-    <button type="button" class="toast-close" aria-label="Tutup notifikasi">
-      <i data-lucide="x" style="width:14px;height:14px;"></i>
-    </button>
-  `;
-
-  toast.querySelector('.toast-body').textContent = message;
-  container.appendChild(toast);
-
-  if (window.lucide) lucide.createIcons();
-
-  toast.querySelector('.toast-close').addEventListener('click', () => removeToast(toast));
-
-  if (duration > 0) setTimeout(() => removeToast(toast), duration);
 }
 
-function removeToast(toast) {
-  if (!toast || toast.classList.contains('is-leaving')) return;
-  toast.classList.add('is-leaving');
-  setTimeout(() => toast.remove(), 200);
-}
+// Load theme saat page load
+(function initTheme() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'dark') {
+    document.documentElement.classList.add('dark');
+  }
+})();
 
-function initDjangoMessages() {
-  const holder = document.getElementById('django-messages');
-  if (!holder) return;
-
-  holder.querySelectorAll('[data-message]').forEach(el => {
-    const type = el.dataset.type || 'info';
-    const text = el.dataset.message || el.textContent.trim();
-    if (text) showToast(text, type);
+// ============================================
+// BULK ACTIONS
+// ============================================
+function toggleSelectAll(checkbox) {
+  document.querySelectorAll('.arsip-checkbox').forEach(function (cb) {
+    cb.checked = checkbox.checked;
   });
-
-  holder.remove();
+  updateBulkBar();
 }
 
-/* ============================================================
-   MODAL
-   ============================================================ */
-let _lastFocused = null;
+function updateBulkBar() {
+  const selected = document.querySelectorAll('.arsip-checkbox:checked');
+  const count = selected.length;
 
-function openModal(id) {
-  const overlay = document.getElementById(id);
-  if (!overlay) return;
+  const bar = document.getElementById('bulkBar');
+  const countEl = document.getElementById('selectedCount');
 
-  _lastFocused = document.activeElement;
-  overlay.classList.add('is-open');
-  document.body.style.overflow = 'hidden';
+  if (bar && countEl) {
+    countEl.textContent = count;
+    bar.style.display = count > 0 ? 'flex' : 'none';
+  }
 
-  const focusTarget = overlay.querySelector('[data-autofocus]')
-                   || overlay.querySelector('.btn-secondary')
-                   || overlay.querySelector('.modal-close');
-  if (focusTarget) setTimeout(() => focusTarget.focus(), 50);
-}
-
-function closeModal(id) {
-  const overlay = document.getElementById(id);
-  if (!overlay) return;
-
-  overlay.classList.remove('is-open');
-  document.body.style.overflow = '';
-
-  if (_lastFocused && typeof _lastFocused.focus === 'function') {
-    _lastFocused.focus();
-    _lastFocused = null;
+  const selectAll = document.getElementById('selectAll');
+  const total = document.querySelectorAll('.arsip-checkbox').length;
+  if (selectAll) {
+    selectAll.checked = count > 0 && count === total;
+    selectAll.indeterminate = count > 0 && count < total;
   }
 }
 
-function initModalBackdropClose() {
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', function (e) {
-      if (e.target === overlay) closeModal(overlay.id);
+// ============================================
+// BULK DELETE — Custom Modal
+// ============================================
+function submitBulkDelete() {
+  const count = document.querySelectorAll('.arsip-checkbox:checked').length;
+  if (count === 0) return;
+
+  // Update count di modal
+  const countEl = document.getElementById('deleteCount');
+  if (countEl) countEl.textContent = count;
+
+  // Buka modal
+  const modal = document.getElementById('deleteModal');
+  if (modal) modal.classList.add('is-open');
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById('deleteModal');
+  if (modal) modal.classList.remove('is-open');
+}
+
+function submitBulkDelete() {
+  const count = document.querySelectorAll('.arsip-checkbox:checked').length;
+  if (count === 0) return;
+
+  const countEl = document.getElementById('deleteCount');
+  if (countEl) countEl.textContent = count;
+
+  const modal = document.getElementById('deleteModal');
+  if (modal) modal.classList.add('is-open');
+}
+
+function closeDeleteModal() {
+  const modal = document.getElementById('deleteModal');
+  if (modal) modal.classList.remove('is-open');
+}
+
+function confirmBulkDelete() {
+  const form = document.getElementById('bulkForm');
+  if (!form) return;
+  form.action = '/arsip/bulk-delete/';
+  form.submit();
+}
+
+function openMoveModal() {
+  const count = document.querySelectorAll('.arsip-checkbox:checked').length;
+  const modal = document.getElementById('moveModal');
+  const moveCount = document.getElementById('moveCount');
+
+  if (count === 0) return;
+
+  if (moveCount) moveCount.textContent = count;
+  if (modal) modal.classList.add('is-open');
+}
+
+function closeMoveModal() {
+  const modal = document.getElementById('moveModal');
+  if (modal) modal.classList.remove('is-open');
+}
+
+function submitBulkMove() {
+  const folderId = document.getElementById('moveFolderSelect').value;
+  if (!folderId) {
+    alert('Pilih folder tujuan dulu.');
+    return;
+  }
+
+  const form = document.getElementById('bulkForm');
+  const folderInput = document.getElementById('bulkFolderId');
+  
+  if (folderInput) folderInput.value = folderId;
+  if (form) {
+    form.action = '/arsip/bulk-move/';
+    form.submit();
+  }
+}
+
+// Update bulk bar saat page load
+document.addEventListener('DOMContentLoaded', function () {
+  updateBulkBar();
+});
+// ============================================
+// SCROLL REVEAL
+// ============================================
+function initScrollReveal() {
+  const elements = document.querySelectorAll('.reveal');
+  if (elements.length === 0) return;
+  
+  if (!('IntersectionObserver' in window)) {
+    elements.forEach(function (el) { el.classList.add('in-view'); });
+    return;
+  }
+  
+  const observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      } else {
+        // Hilang saat keluar viewport (biar bisa re-play)
+        entry.target.classList.remove('in-view');
+      }
     });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -60px 0px'
   });
+  
+  elements.forEach(function (el) { observer.observe(el); });
 }
 
+// Panggil saat DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initScrollReveal);
+} else {
+  initScrollReveal();
+}
+
+// ============================================
+// KEYBOARD SHORTCUT — `/` focus search
+// ============================================
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') {
-    const open = document.querySelector('.modal-overlay.is-open');
-    if (open) closeModal(open.id);
+  // Skip kalau lagi ngetik di input/textarea
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) return;
+  
+  // Skip kalau ada modifier key
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  
+  if (e.key === '/') {
+    const search = document.querySelector('.navbar-search-input');
+    if (search) {
+      e.preventDefault();
+      search.focus();
+      search.select();
+    }
   }
 });
 
-/* ============================================================
-   TREE SIDEBAR
-   ============================================================ */
-function initTree() {
-  document.querySelectorAll('.tree-toggle:not(.empty)').forEach(function (toggle) {
-    toggle.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const targetId = this.dataset.target;
-      const target = document.getElementById(targetId);
-      if (!target) return;
-
-      const isOpen = target.style.display !== 'none';
-      if (isOpen) {
-        target.style.display = 'none';
-        this.classList.remove('open');
-      } else {
-        target.style.display = 'block';
-        this.classList.add('open');
-      }
-    });
+// ============================================
+// PAGE TRANSITION
+// ============================================
+(function () {
+  // Fade in saat page load
+  window.addEventListener('load', function () {
+    document.body.classList.add('page-loaded');
   });
-
-  // Auto-expand ke folder yang aktif
-  const activeRow = document.querySelector('.tree-row.is-active');
-  if (activeRow) {
-    let parent = activeRow.closest('.tree-children');
-    while (parent) {
-      parent.style.display = 'block';
-      const parentLi = parent.parentElement;
-      const toggle = parentLi ? parentLi.querySelector('.tree-toggle') : null;
-      if (toggle) toggle.classList.add('open');
-      parent = parent.parentElement ? parent.parentElement.closest('.tree-children') : null;
-    }
-  }
-}
-
-/* ============================================================
-   SIDEBAR MOBILE TOGGLE
-   ============================================================ */
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
-  sidebar.classList.toggle('is-open');
-}
-
-/* ============================================================
-   PAGE TRANSITION
-   ============================================================ */
-function initPageTransition() {
-  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReduced) return;
-
-  document.querySelectorAll('a[href]').forEach(link => {
+  
+  // Fallback kalau load event gak ke-trigger
+  setTimeout(function () {
+    document.body.classList.add('page-loaded');
+  }, 100);
+  
+  // Fade out saat klik link internal
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('a');
+    if (!link) return;
+    
     const href = link.getAttribute('href');
-    if (!href ||
-        href.startsWith('#') ||
-        href.startsWith('http') ||
-        href.startsWith('mailto:') ||
-        href.startsWith('tel:') ||
-        link.hasAttribute('download') ||
-        link.getAttribute('target') === '_blank') {
-      return;
+    if (!href) return;
+    
+    // Skip kalau:
+    // - Link eksternal
+    // - Target _blank
+    // - Anchor (#)
+    // - Download
+    // - Ctrl/Cmd + klik (buka tab baru)
+    if (
+      href.startsWith('http') ||
+      href.startsWith('//') ||
+      link.target === '_blank' ||
+      href.startsWith('#') ||
+      href.startsWith('mailto:') ||
+      link.hasAttribute('download') ||
+      e.ctrlKey || e.metaKey
+    ) return;
+    
+    // Fade out
+    e.preventDefault();
+    document.body.classList.remove('page-loaded');
+    document.body.classList.add('page-leaving');
+    
+    setTimeout(function () {
+      window.location.href = href;
+    }, 180);
+  });
+})();
+// ============================================
+// AUTO-INIT TREE
+// ============================================
+document.addEventListener('DOMContentLoaded', function () {
+  if (document.querySelector('.tree-list') || document.querySelector('.tree-toggle')) {
+    if (typeof initTree === 'function') {
+      console.log('[auto] initTree called');
+      initTree();
     }
+  }
+});
 
-    link.addEventListener('click', function (e) {
-      if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
+// ============================================
+// HERO V3 — Rolling Number
+// ============================================
+function initCountUp() {
+  const els = document.querySelectorAll('[data-count-up]');
+  
+  function animate(el) {
+    const target = parseInt(el.dataset.countUp, 10) || 0;
+    const duration = 1500;
+    const start = performance.now();
+    
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      // Ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(target * eased).toLocaleString('id-ID');
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  
+  if (!('IntersectionObserver' in window)) {
+    els.forEach(animate);
+    return;
+  }
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        animate(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  
+  els.forEach(el => observer.observe(el));
+}
 
-      e.preventDefault();
-      const main = document.querySelector('.main-content');
-      if (main) {
-        main.classList.add('is-leaving');
-        setTimeout(() => { window.location.href = href; }, 150);
+
+// ============================================
+// MAGNETIC TITLE — per span (bukan per huruf)
+// ============================================
+function initMagneticTitle() {
+  const title = document.querySelector('[data-cursor-follow]');
+  if (!title) return;
+
+  const spans = title.querySelectorAll('span');
+  if (spans.length === 0) return;
+
+  const MAX_DIST = 200;
+  const POWER = 14;
+
+  title.addEventListener('mousemove', (e) => {
+    const mx = e.clientX;
+    const my = e.clientY;
+
+    spans.forEach((span) => {
+      const rect = span.getBoundingClientRect();
+      const sx = rect.left + rect.width / 2;
+      const sy = rect.top + rect.height / 2;
+
+      const dx = sx - mx;
+      const dy = sy - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < MAX_DIST && dist > 0) {
+        const influence = 1 - dist / MAX_DIST;
+        const power = influence * POWER;
+        const angle = Math.atan2(dy, dx);
+        const moveX = Math.cos(angle) * power;
+        const moveY = Math.sin(angle) * power;
+
+        span.style.transform = `translate(${moveX}px, ${moveY}px)`;
       } else {
-        window.location.href = href;
+        span.style.transform = 'translate(0, 0)';
+      }
+    });
+  });
+
+  title.addEventListener('mouseleave', () => {
+    spans.forEach((span) => {
+      span.style.transform = 'translate(0, 0)';
+    });
+  });
+}
+
+// ============================================
+// RECENT CARDS — Click to focus (mobile)
+// ============================================
+function initRecentCards() {
+  const cards = document.querySelectorAll('.recent-card-v3');
+  if (!cards.length) return;
+
+  cards.forEach((card) => {
+    card.addEventListener('click', (e) => {
+      // Kalau belum aktif, aktifkan dulu (gak langsung navigasi)
+      if (!card.classList.contains('is-active')) {
+        // Cek apakah di mobile (gak ada hover)
+        const isTouch = window.matchMedia('(hover: none)').matches;
+        if (isTouch) {
+          e.preventDefault();
+          cards.forEach((c) => c.classList.remove('is-active'));
+          card.classList.add('is-active');
+        }
       }
     });
   });
 }
 
-/* ============================================================
-   INIT
-   ============================================================ */
+// ============================================
+// INIT
+// ============================================
 document.addEventListener('DOMContentLoaded', function () {
-  if (window.lucide) lucide.createIcons();
-  updateThemeIcon();
-  initPageTransition();
-  initModalBackdropClose();
-  initDjangoMessages();
-  initTree();
+  initCountUp();
+  initMagneticTitle();
+  initRecentCards();
 });
+
 // ============================================
-// TREE VIEW
+// DOC STACK — Mouse Parallax
 // ============================================
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('[tree] init');
+function initDocStack() {
+  const stack = document.getElementById('docStack');
+  if (!stack) return;
 
-  // Toggle click handler
-  document.querySelectorAll('.tree-toggle:not(.empty)').forEach(function (toggle) {
-    toggle.addEventListener('click', function (e) {
-      e.preventDefault();
-      e.stopPropagation();
+  const cards = stack.querySelectorAll('.doc-card');
+  if (cards.length === 0) return;
 
-      const targetId = this.dataset.target;
-      const target = document.getElementById(targetId);
-      if (!target) return;
+  let isAnimating = false;
 
-      const isHidden = target.classList.contains('is-hidden');
+  stack.addEventListener('mousemove', (e) => {
+    if (isAnimating) return;
+    isAnimating = true;
 
-      if (isHidden) {
-        target.classList.remove('is-hidden');
-        this.classList.add('open');
-        console.log('[tree] OPEN:', targetId);
-      } else {
-        target.classList.add('is-hidden');
-        this.classList.remove('open');
-        console.log('[tree] CLOSE:', targetId);
-      }
+    requestAnimationFrame(() => {
+      const rect = stack.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+
+      // Tilt: -15deg to +15deg (lebih sensitif)
+      const tiltX = (y - 0.5) * -18;
+      const tiltY = (x - 0.5) * 18;
+
+      // Apply tilt ke seluruh stack
+      stack.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+
+      // Parallax per card
+      cards.forEach((card) => {
+        // Hentikan floating animation sementara
+        card.style.animationPlayState = 'paused';
+
+        let base = '';
+        let depth = 0;
+
+        if (card.classList.contains('doc-card-3')) {
+          base = 'rotate(-10deg) translateZ(-60px) translateY(-20px)';
+          depth = 24;
+        } else if (card.classList.contains('doc-card-2')) {
+          base = 'rotate(-5deg) translateZ(-30px) translateY(-10px)';
+          depth = 16;
+        } else {
+          base = 'rotate(0deg)';
+          depth = 10;
+        }
+
+        const px = (x - 0.5) * depth;
+        const py = (y - 0.5) * depth;
+
+        card.style.transform = `${base} translate(${px}px, ${py}px)`;
+      });
+
+      isAnimating = false;
     });
   });
 
-  // DEFAULT: SEMUA TERBUKA
-  document.querySelectorAll('.tree-toggle:not(.empty)').forEach(function (t) {
-    t.classList.add('open');
+  stack.addEventListener('mouseleave', () => {
+    stack.style.transform = '';
+    cards.forEach((card) => {
+      card.style.transform = '';
+      card.style.animationPlayState = 'running';
+    });
   });
-
-  console.log('[tree] done');
-});
-
-// ============================================
-// TOGGLE SIDEBAR (Mobile)
-// ============================================
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  if (!sidebar) return;
-  sidebar.classList.toggle('open');
 }
+
+// ============================================
+// INIT
+// ============================================
+document.addEventListener('DOMContentLoaded', function () {
+  initDocStack();
+  initCountUp();
+  initMagneticTitle();
+  initRecentCards();
+});

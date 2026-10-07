@@ -157,3 +157,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'   # akan di-redirect dinamis
 LOGOUT_REDIRECT_URL = '/login/'
+
+# ============================================
+# PDF IFRAME SUPPORT
+# ============================================
+X_FRAME_OPTIONS = 'SAMEORIGIN'

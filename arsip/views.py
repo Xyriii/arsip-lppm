@@ -13,18 +13,39 @@ from .models import Arsip, Folder
 from .forms import ArsipForm, BulkArsipForm, FolderUploadForm, StaffCreationForm
 from .utils import build_breadcrumb, build_full_tree
 from django.shortcuts import redirect
+from .models import Arsip, Folder, ActivityLog
+
+
+def log_activity(user, action, description, target_type='', target_id=None, request=None):
+    """Helper buat nyatet aktivitas"""
+    ip = None
+    if request:
+        x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded:
+            ip = x_forwarded.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+    
+    try:
+        ActivityLog.objects.create(
+            user=user if user.is_authenticated else None,
+            action=action,
+            description=description,
+            target_type=target_type,
+            target_id=target_id,
+            ip_address=ip,
+        )
+    except Exception as e:
+        print(f"[log_activity] Error: {e}")
 
 def is_admin(user):
     """Cek user punya akses admin"""
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 
 def dashboard_redirect(request):
-    """Root URL: public dashboard. Kalau admin, redirect ke arsip."""
-    # Kalau user login sebagai admin, langsung ke /arsip/
-    if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
+    """Root URL: admin → dashboard, lainnya → public home"""
+    if request.user.is_authenticated and request.user.is_staff:
         return redirect('arsip:list')
-    
-    # Selain itu (user biasa ATAU belum login) → public dashboard
     return redirect('arsip:public_home')
 
 
@@ -33,6 +54,9 @@ def dashboard_redirect(request):
 # ============================================
 
 def arsip_list(request):
+    # User biasa (bukan admin) → redirect ke public home
+    if request.user.is_authenticated and not request.user.is_staff:
+        return redirect('arsip:public_home')
     """Dashboard admin + daftar arsip dengan pagination"""
     from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
     from django.db.models import Sum, Count
@@ -95,6 +119,7 @@ def arsip_list(request):
 
     context = {
         'arsip_list': arsip_page,
+        'alls_folders': Folder.objects.filter(is_active=True).order_by('level', 'name'),
         'page_obj': arsip_page,
         'paginator': paginator,
         'total_hasil': paginator.count,
@@ -116,7 +141,12 @@ def arsip_list(request):
         'arsip_per_tahun': arsip_per_tahun,
         'recent_arsip': recent_arsip,
     }
-    return render(request, 'arsip/list.html', context)
+    if request.user.is_authenticated and request.user.is_staff:
+        template = 'arsip/admin_dashboard.html'
+    else:
+        template = 'arsip/list.html'
+
+    return render(request, template, context)
 
     # ============================================
     # STATISTIK DASHBOARD
@@ -174,7 +204,6 @@ def arsip_list(request):
     return render(request, 'arsip/list.html', context)
 
 
-@login_required
 def arsip_detail(request, pk):
     """Halaman detail 1 arsip"""
     arsip = get_object_or_404(Arsip, pk=pk, is_active=True)
@@ -222,6 +251,14 @@ def arsip_edit(request, pk):
                 pass
         
         arsip.save()
+
+        log_activity(
+            request.user, 'edit',
+            f'Edit arsip "{arsip.name}"',
+            target_type='arsip', target_id=arsip.pk,
+            request=request
+        )
+
         messages.success(request, f'Arsip "{arsip.name}" berhasil diupdate.')
         return redirect('arsip:detail', pk=arsip.pk)
     
@@ -238,8 +275,21 @@ def arsip_delete(request, pk):
     arsip = get_object_or_404(Arsip, pk=pk)
 
     if request.method == 'POST':
+        # Simpen dulu datanya SEBELUM delete
         nama = arsip.name
+        arsip_id = arsip.pk
+        
+        # Baru delete
         arsip.delete()
+        
+        # Log aktivitas
+        log_activity(
+            request.user, 'delete',
+            f'Hapus arsip "{nama}"',
+            target_type='arsip', target_id=arsip_id,
+            request=request
+        )
+        
         messages.success(request, f'Arsip "{nama}" berhasil dihapus.')
         return redirect('arsip:list')
 
@@ -259,6 +309,14 @@ def arsip_upload(request):
             arsip = form.save(commit=False)
             arsip.size_bytes = request.FILES['file'].size
             arsip.save()
+
+            log_activity(
+                request.user, 'upload',
+                f'Upload file "{arsip.name}"',
+                target_type='arsip', target_id=arsip.pk,
+                request=request
+            )
+
             messages.success(request, f'Arsip "{arsip.name}" berhasil diunggah.')
             return redirect('arsip:list')
     else:
@@ -393,7 +451,6 @@ def folder_upload(request):
 # FOLDER BROWSE & EDIT
 # ============================================
 
-@login_required
 def folder_browse(request, pk=None):
     """Browse folder (tree view)"""
     if pk:
@@ -411,6 +468,19 @@ def folder_browse(request, pk=None):
     breadcrumb = build_breadcrumb(current_folder) if current_folder else []
     full_tree = build_full_tree()
 
+    # ============================================
+    # HITUNG ANCESTOR IDs (parent + grandparent + dst)
+    # ============================================
+    ancestor_ids = []
+    if current_folder:
+        # Folder aktif sendiri
+        ancestor_ids.append(current_folder.pk)
+        # Semua parent ke atas
+        parent = current_folder.parent
+        while parent:
+            ancestor_ids.append(parent.pk)
+            parent = parent.parent
+
     context = {
         'current_folder': current_folder,
         'subfolders': subfolders,
@@ -418,6 +488,7 @@ def folder_browse(request, pk=None):
         'breadcrumb': breadcrumb,
         'full_tree': full_tree,
         'current_folder_id': current_folder.id if current_folder else None,
+        'ancestor_ids': ancestor_ids,  # ← BARU
         'all_folders': Folder.objects.filter(is_active=True).order_by('level', 'name'),
     }
     return render(request, 'arsip/folder_browse.html', context)
@@ -451,6 +522,14 @@ def folder_edit(request, pk):
             folder.parent = None
         
         folder.save()
+
+        log_activity(
+            request.user, 'edit',
+            f'Edit folder "{folder.name}"',
+            target_type='folder', target_id=folder.pk,
+            request=request
+        )
+
         messages.success(request, f'Folder "{folder.name}" berhasil diupdate.')
         return redirect('arsip:folder', pk=folder.pk)
     
@@ -614,3 +693,101 @@ def export_excel(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     wb.save(response)
     return response
+
+@user_passes_test(is_admin)
+def bulk_delete(request):
+    """Bulk delete: hapus banyak arsip sekaligus"""
+    if request.method == 'POST':
+        arsip_ids = request.POST.getlist('arsip_ids')
+
+        if not arsip_ids:
+            messages.warning(request, 'Gak ada arsip yang dipilih.')
+            return redirect('arsip:list')
+
+        deleted = Arsip.objects.filter(pk__in=arsip_ids).update(is_active=False)
+
+        log_activity(
+            request.user, 'delete',
+            f'Bulk delete {deleted} arsip',
+            target_type='arsip', request=request
+        )
+
+        messages.success(request, f'{deleted} arsip berhasil dihapus.')
+        return redirect('arsip:list')
+
+    return redirect('arsip:list')
+
+
+@user_passes_test(is_admin)
+def bulk_move(request):
+    """Bulk move: pindahkan banyak arsip ke folder lain"""
+    if request.method == 'POST':
+        arsip_ids = request.POST.getlist('arsip_ids')
+        folder_id = request.POST.get('folder_id')
+
+        if not arsip_ids:
+            messages.warning(request, 'Gak ada arsip yang dipilih.')
+            return redirect('arsip:list')
+
+        if not folder_id:
+            messages.error(request, 'Pilih folder tujuan dulu.')
+            return redirect('arsip:list')
+
+        try:
+            target_folder = Folder.objects.get(pk=folder_id, is_active=True)
+        except Folder.DoesNotExist:
+            messages.error(request, 'Folder tujuan gak ditemukan.')
+            return redirect('arsip:list')
+
+        moved = Arsip.objects.filter(pk__in=arsip_ids).update(folder=target_folder)
+
+        log_activity(
+            request.user, 'move',
+            f'Pindah {moved} arsip ke "{target_folder.name}"',
+            target_type='arsip', target_id=target_folder.pk,
+            request=request
+        )
+
+        messages.success(request, f'{moved} arsip berhasil dipindahkan ke "{target_folder.name}".')
+        return redirect('arsip:folder', pk=target_folder.pk)
+
+    return redirect('arsip:list')
+
+@user_passes_test(is_admin)
+def activity_log(request):
+    """Halaman log aktivitas"""
+    from django.core.paginator import Paginator
+    
+    # Filter
+    action_filter = request.GET.get('action', '')
+    user_filter = request.GET.get('user', '')
+    page = request.GET.get('page', 1)
+    
+    logs = ActivityLog.objects.select_related('user').all()
+    
+    if action_filter:
+        logs = logs.filter(action=action_filter)
+    if user_filter:
+        logs = logs.filter(user__username=user_filter)
+    
+    # Pagination
+    paginator = Paginator(logs, 30)
+    try:
+        log_page = paginator.page(page)
+    except:
+        log_page = paginator.page(1)
+    
+    # User list buat filter
+    from django.contrib.auth.models import User
+    users = User.objects.filter(activities__isnull=False).distinct()
+    
+    context = {
+        'log_list': log_page,
+        'page_obj': log_page,
+        'paginator': paginator,
+        'action_filter': action_filter,
+        'user_filter': user_filter,
+        'action_choices': ActivityLog.ACTION_CHOICES,
+        'users': users,
+    }
+    return render(request, 'arsip/activity_log.html', context)

@@ -2,72 +2,64 @@
 {% block title %}Tambah Pengguna — Arsip LPPM UNS{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="upload-wrap">
+<div class="form-page-v2">
 
-    <a href="{% url 'arsip:user_list' %}" class="btn-back">
-      <i data-lucide="arrow-left"></i>
-      <span>Kembali ke Kelola Pengguna</span>
-    </a>
+  <a href="{% url 'arsip:user_list' %}" class="btn-back-v2">
+    <i data-lucide="arrow-left"></i>
+    <span>Kembali ke Kelola Pengguna</span>
+  </a>
 
-    <div class="upload-header">
+  <div class="form-header-v2 reveal">
+    <div class="form-header-icon-v2">
       <i data-lucide="user-plus"></i>
-      <h1>Tambah Pengguna Baru</h1>
-      <p>Bikin akun untuk staff atau pengguna sistem.</p>
     </div>
+    <h1>Tambah Pengguna Baru</h1>
+    <p>Bikin akun untuk staff atau pengguna sistem.</p>
+  </div>
 
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}" style="margin-bottom:16px;">
-          <i data-lucide="{% if message.tags == 'error' %}alert-circle{% else %}check-circle{% endif %}"></i>
-          <span>{{ message }}</span>
+  {% if form.non_field_errors %}
+    <div class="alert-v2 alert-error reveal">
+      <i data-lucide="alert-circle"></i>
+      <span>{{ form.non_field_errors.0 }}</span>
+    </div>
+  {% endif %}
+
+  <div class="form-card-v2 reveal">
+    <form method="post">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="form-field-v2">
+          <label for="{{ field.id_for_label }}" class="form-label-v2">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small class="form-help-v2">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <small class="form-error-v2">{{ field.errors.0 }}</small>
+          {% endif %}
         </div>
       {% endfor %}
-    {% endif %}
 
-    <div class="glass-card">
-      <form method="post">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-          <div class="login-alert" style="margin-bottom:16px;">
-            <i data-lucide="alert-circle"></i>
-            <span>{{ form.non_field_errors.0 }}</span>
-          </div>
-        {% endif %}
-
-        {% for field in form %}
-          <div class="form-group">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}
-              <small class="form-help">{{ field.help_text }}</small>
-            {% endif %}
-            {% if field.errors %}
-              <small class="field-error">{{ field.errors.0 }}</small>
-            {% endif %}
-          </div>
-        {% endfor %}
-
-        <div class="form-actions">
-          <a href="{% url 'arsip:user_list' %}" class="btn btn-secondary">
-            <i data-lucide="x"></i>
-            <span>Batal</span>
-          </a>
-          <button type="submit" class="btn btn-primary">
-            <i data-lucide="save"></i>
-            <span>Simpan Pengguna</span>
-          </button>
-        </div>
-      </form>
-    </div>
-
+      <div class="form-actions-v2">
+        <a href="{% url 'arsip:user_list' %}" class="btn-v2 btn-v2-secondary">
+          <i data-lucide="x"></i>
+          <span>Batal</span>
+        </a>
+        <button type="submit" class="btn-v2 btn-v2-primary">
+          <i data-lucide="save"></i>
+          <span>Simpan Pengguna</span>
+        </button>
+      </div>
+    </form>
   </div>
+
 </div>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof initScrollReveal === 'function') initScrollReveal();
   });
 </script>
 {% endblock %}
