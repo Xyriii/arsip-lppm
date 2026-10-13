@@ -1,7 +1,30 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Beranda — Arsip LPPM UNS{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/splash.css' %}">
+{% endblock %}
+
 {% block content %}
+
+{# ========== SPLASH SCREEN ========== #}
+<div class="splash" id="splash" role="dialog" aria-label="Welcome">
+  <div class="splash-content">
+    <div class="splash-hello">
+      <span class="splash-letter">H</span><span class="splash-letter">e</span><span class="splash-letter">l</span><span class="splash-letter">l</span><span class="splash-letter">o</span>
+    </div>
+    <div class="splash-logo">
+      <img src="{% static 'img/logo-uns.svg' %}" alt="UNS">
+    </div>
+  </div>
+
+  <div class="splash-hint">
+    <span class="splash-hint-text">Tekan tombol apa saja untuk melanjutkan</span>
+    <span class="splash-hint-pulse"></span>
+  </div>
+</div>
 
 {# HERO SECTION #}
 <section class="hero-v3">
@@ -276,12 +299,4 @@
     </div>
   </div>
 </section>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-    if (typeof initScrollReveal === 'function') initScrollReveal();
-  });
-</script>
-
 {% endblock %}
